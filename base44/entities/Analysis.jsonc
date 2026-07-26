@@ -1,0 +1,111 @@
+{
+  "name": "Analysis",
+  "type": "object",
+  "properties": {
+    "headline": {
+      "type": "string"
+    },
+    "about": {
+      "type": "string"
+    },
+    "posts": {
+      "type": "string"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "verdict_title": {
+      "type": "string"
+    },
+    "verdict_summary": {
+      "type": "string"
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "observation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "signal_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "lexical_stats": {
+      "type": "object",
+      "properties": {
+        "type_token_ratio": {
+          "type": "number"
+        },
+        "avg_sentence_length": {
+          "type": "number"
+        },
+        "evidence_per_100_words": {
+          "type": "number"
+        },
+        "repeated_phrases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dominant_topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rewrites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "original": {
+            "type": "string"
+          },
+          "revised": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "email": {
+      "type": "string"
+    },
+    "unlocked": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "headline"
+  ]
+}
