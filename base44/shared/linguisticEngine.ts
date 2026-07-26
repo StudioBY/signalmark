@@ -69,9 +69,9 @@ SURFACE INVENTORY (ground truth, established by direct measurement of the corpus
 FACTUAL LAW: you may state that a surface is empty ONLY if it is marked ABSENT above. Any surface marked PRESENT contains text that is reproduced in full below, and describing it as empty, missing or thin-to-the-point-of-absent is a factual error.
 
 FINAL SCORES (do not restate them as anything other than these values):
-  message consistency ${scores.message_consistency} (deterministic, ${SEMANTIC_METHOD}: mean surface-to-surface cosine ${sem.stats.mean_surface_cosine} over ${inv.present_surfaces.length} populated surfaces)
+  message consistency ${scores.message_consistency} (deterministic, ${SEMANTIC_METHOD}: mean leave-one-out surface cosine ${sem.stats.mean_surface_cosine} over ${inv.present_surfaces.length} populated surfaces)
   evidence density ${scores.evidence_density} (deterministic)
-  topical focus ${scores.topical_focus} (deterministic, ${SEMANTIC_METHOD}: ${sem.stats.scored_units} text units in ${sem.stats.topic_clusters} topic clusters, mean centroid cosine ${sem.stats.mean_centroid_cosine})
+  topical focus ${scores.topical_focus} (deterministic, ${SEMANTIC_METHOD}: ${sem.stats.scored_units} text units in ${sem.stats.topic_clusters} topic clusters, largest cluster ${sem.stats.largest_cluster} units, mean centroid cosine ${sem.stats.mean_centroid_cosine})
   lexical distinctiveness ${scores.lexical_distinctiveness} (deterministic)
   redundancy control ${scores.redundancy} (deterministic)
   composite ${composite}

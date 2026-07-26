@@ -4,7 +4,7 @@
  * All calibration constants are explicit and versioned via ENGINE_VERSION.
  */
 
-export const ENGINE_VERSION = "3.0.0-deterministic";
+export const ENGINE_VERSION = "3.1.0-deterministic";
 
 /** Removes URLs before any metric is computed — they are not language. */
 export function stripUrls(text) {
