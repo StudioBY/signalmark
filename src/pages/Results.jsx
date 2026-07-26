@@ -31,11 +31,17 @@ export default function Results() {
 
   const metrics = analysis.metrics || [];
 
+  const slug = (analysis.profile_url || "").replace(/\/+$/, "").split("/in/")[1];
+  const subjectLabel = analysis.full_name || (slug ? `linkedin.com/in/${slug}` : "");
+
   return (
     <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
       <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
-        <div className="flex items-center justify-between">
-          <p className="text-[11px] uppercase tracking-[0.32em] text-neutral-400">Report</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.32em] text-neutral-400">Report</p>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.32em] text-[#1B2430]">{subjectLabel}</p>
+          </div>
           <Link to="/" className="text-[11px] uppercase tracking-[0.2em] text-neutral-400 hover:text-[#1B2430]">
             New analysis
           </Link>
@@ -50,7 +56,7 @@ export default function Results() {
           </div>
           <div>
             <h1 className="text-[26px] font-light leading-snug tracking-tight">{analysis.verdict_title}</h1>
-            <p className="mt-5 text-[14px] font-light leading-relaxed text-neutral-500">
+            <p className="mt-5 text-[16px] font-light leading-[1.7] text-neutral-500">
               {analysis.verdict_summary}
             </p>
           </div>
@@ -77,7 +83,7 @@ export default function Results() {
               </div>
               <div className="absolute inset-0 bg-gradient-to-b from-[#FCFCFB]/10 via-[#FCFCFB]/85 to-[#FCFCFB]" />
               <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-5 pb-4">
-                <p className="max-w-sm text-center text-[13px] font-light leading-relaxed text-neutral-500">
+                <p className="max-w-sm text-center text-[15px] font-light leading-[1.7] text-neutral-500">
                   Lexical measurements, signal findings and line-level revisions are included in the
                   full report.
                 </p>

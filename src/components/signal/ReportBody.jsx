@@ -16,8 +16,8 @@ export default function ReportBody({ analysis }) {
         <div className="mt-8 space-y-10">
           {(analysis.signal_findings || []).map((f, i) => (
             <div key={i} className="border-t border-neutral-200 pt-6">
-              <h4 className="text-[15px] font-medium text-[#1B2430]">{f.title}</h4>
-              <p className="mt-3 max-w-2xl text-[14px] font-light leading-relaxed text-neutral-600">{f.body}</p>
+              <h4 className="text-[17px] font-medium text-[#1B2430]">{f.title}</h4>
+              <p className="mt-3 max-w-2xl text-[16px] font-light leading-[1.7] text-neutral-600">{f.body}</p>
             </div>
           ))}
         </div>
@@ -28,9 +28,9 @@ export default function ReportBody({ analysis }) {
         <div className="mt-8 space-y-10">
           {(analysis.rewrites || []).map((r, i) => (
             <div key={i} className="border-t border-neutral-200 pt-6">
-              <p className="text-[13px] font-light italic leading-relaxed text-neutral-400">{r.original}</p>
-              <p className="mt-3 text-[15px] font-light leading-relaxed text-[#1B2430]">{r.revised}</p>
-              <p className="mt-3 text-[12px] font-light text-neutral-500">{r.rationale}</p>
+              <p className="text-[15px] font-light italic leading-[1.7] text-neutral-400">{r.original}</p>
+              <p className="mt-3 text-[17px] font-light leading-[1.7] text-[#1B2430]">{r.revised}</p>
+              <p className="mt-3 text-[14px] font-light leading-relaxed text-neutral-500">{r.rationale}</p>
             </div>
           ))}
         </div>

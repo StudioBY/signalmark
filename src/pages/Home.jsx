@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import UrlForm from "@/components/signal/UrlForm";
+import AnalysisProgress from "@/components/signal/AnalysisProgress";
 
 export default function Home() {
   const [busy, setBusy] = useState(false);
@@ -35,7 +36,7 @@ export default function Home() {
           <h1 className="mt-8 max-w-xl text-[38px] font-extralight leading-[1.15] tracking-tight md:text-[46px]">
             A measurement of how your profile writes.
           </h1>
-          <p className="mt-6 max-w-lg text-[15px] font-light leading-relaxed text-neutral-500">
+          <p className="mt-6 max-w-lg text-[17px] font-light leading-[1.7] text-neutral-500">
             Five text-derived signals — consistency, evidence density, topical focus, lexical
             distinctiveness and redundancy — computed from the headline, About section and recent
             posts of any public profile. No rubric grading, no opinions.
@@ -43,7 +44,11 @@ export default function Home() {
         </motion.div>
 
         <div className="mt-20">
-          <UrlForm onSubmit={run} busy={busy} error={error} />
+          {busy || error ? (
+            <AnalysisProgress error={error} onRetry={() => setError("")} />
+          ) : (
+            <UrlForm onSubmit={run} busy={busy} />
+          )}
         </div>
       </div>
     </div>

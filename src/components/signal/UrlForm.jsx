@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 
-export default function UrlForm({ onSubmit, busy, error }) {
+export default function UrlForm({ onSubmit, busy }) {
   const [url, setUrl] = useState("");
 
   return (
@@ -22,7 +22,7 @@ export default function UrlForm({ onSubmit, busy, error }) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="linkedin.com/in/username"
-          className="h-11 flex-1 rounded-none border-0 border-b border-neutral-200 bg-transparent px-0 text-[15px] font-light shadow-none transition-colors focus-visible:border-[#1B2430] focus-visible:ring-0"
+          className="h-12 flex-1 rounded-none border-0 border-b border-neutral-200 bg-transparent px-0 text-[17px] font-light shadow-none transition-colors focus-visible:border-[#1B2430] focus-visible:ring-0 md:text-[17px]"
         />
         <button
           type="submit"
@@ -33,14 +33,6 @@ export default function UrlForm({ onSubmit, busy, error }) {
         </button>
       </div>
 
-      {busy && (
-        <p className="mt-8 text-[11px] uppercase tracking-[0.2em] text-neutral-400">
-          Retrieving profile text · extracting signals
-        </p>
-      )}
-      {error && !busy && (
-        <p className="mt-8 max-w-md text-[13px] font-light leading-relaxed text-neutral-500">{error}</p>
-      )}
     </form>
   );
 }

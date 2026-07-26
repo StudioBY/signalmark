@@ -90,5 +90,7 @@
 
   body {
     @apply bg-background text-foreground font-body;
+    font-size: 18px;
+    line-height: 1.65;
   }
 }

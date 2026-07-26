@@ -22,7 +22,7 @@ export default function MetricCard({ metric, index = 0 }) {
         />
       </div>
       {metric.observation && (
-        <p className="mt-4 text-[13px] leading-relaxed text-neutral-500 font-light">{metric.observation}</p>
+        <p className="mt-4 text-[15px] leading-[1.7] text-neutral-500 font-light">{metric.observation}</p>
       )}
     </motion.div>
   );

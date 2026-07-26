@@ -18,11 +18,11 @@ export default function LexicalStats({ stats }) {
       </div>
       <div className="mt-10 md:mt-0">
         <p className="text-[11px] uppercase tracking-[0.2em] text-neutral-400">Repeated phrases</p>
-        <p className="mt-3 text-[13px] font-light leading-relaxed text-neutral-600">
+        <p className="mt-3 text-[15px] font-light leading-[1.7] text-neutral-600">
           {(stats.repeated_phrases || []).join(" · ") || "—"}
         </p>
         <p className="mt-8 text-[11px] uppercase tracking-[0.2em] text-neutral-400">Dominant topics</p>
-        <p className="mt-3 text-[13px] font-light leading-relaxed text-neutral-600">
+        <p className="mt-3 text-[15px] font-light leading-[1.7] text-neutral-600">
           {(stats.dominant_topics || []).join(" · ") || "—"}
         </p>
       </div>
