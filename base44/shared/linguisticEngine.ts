@@ -1,4 +1,4 @@
-import { computeDeterministicMetrics, ENGINE_VERSION } from './textMetrics.ts';
+import { computeDeterministicMetrics, cleanSurfaces, ENGINE_VERSION } from './textMetrics.ts';
 import { semanticCacheKey } from './semanticCache.ts';
 
 export { ENGINE_VERSION };
@@ -92,8 +92,16 @@ Each observation: one or two sentences, citing concrete wording from the text. N
 verdict_title: max 8 words, factual, no hype. Example register: "Consistent positioning, thin quantified evidence".
 verdict_summary: exactly 2 sentences stating what the score set means. Reference the measured statistics below, not intuition.
 
-signal_findings: exactly 4 findings (short title + 2-3 analytical sentences). Ground each finding in the MEASURED STATISTICS below or in verbatim text. Never invent a number: only cite figures present in those statistics.
-POLARITY LAW for the redundancy finding: title it exactly "Redundancy Control", and phrase it so that a HIGH score means LESS repetition (efficient compression) and a LOW score means MORE repetition. Never describe a high redundancy control score as redundant. Register example: "A redundancy control score of 86 indicates efficient compression, with a trigram repeat rate of 0.02."
+signal_findings: exactly 4 findings (short title + 2-3 analytical sentences). Ground each finding in the MEASURED STATISTICS below or in verbatim text. Never invent a number: only cite figures present in those statistics. Never quote a URL or a web address in any finding — the corpus below has already had URLs and hashtags removed, so no link may appear in your output.
+
+METRIC POLARITY DEFINITIONS — every description must agree with the direction of the metric it discusses. A description that contradicts the number is an error:
+  message_consistency (higher = the same positioning claim recurs across surfaces; lower = surfaces diverge)
+  evidence_density (higher = MORE quantified markers per 100 words; lower = thin quantified evidence)
+  topical_focus (higher = topics concentrated in one domain; lower = topically scattered)
+  lexical_distinctiveness (higher = varied, specific vocabulary with LITTLE generic boilerplate; lower = generic register)
+  redundancy — displayed as "Redundancy Control" (higher = LESS repetition: a LOW trigram repeat rate and few filler markers, i.e. efficient compression; lower = MORE repetition)
+Before writing each finding, read the metric's score AND its underlying statistic and state them in agreement: e.g. a redundancy control score of 83 with a trigram repeat rate of 0.01 is LOW repetition and must never be called "moderate repetition"; a score of 30 with a repeat rate of 0.12 is HIGH repetition. Apply the same check to the other four metrics.
+Titles are held to the same polarity check as bodies: a title may not contain a qualifier that contradicts the score (never "Low Redundancy Control" for a score of 80 — a high redundancy control score means little repetition). The redundancy finding's title must be exactly "Redundancy Control", with no added qualifier.
 
 rewrites: exactly 3 line-level revisions. "original" MUST be a verbatim line from the input text. "revised" must raise a named metric. "rationale": one sentence naming which metric it raises and why.
 
@@ -127,6 +135,8 @@ const clampScore = (n) => Math.max(0, Math.min(100, Math.round(Number(n) || 0)))
  */
 export async function runEngine(extracted, invokeLLM, cache = null) {
   const deterministic = computeDeterministicMetrics(extracted);
+  // The semantic layer reads the same cleaned corpus the metrics were computed on.
+  const cleaned = cleanSurfaces(extracted);
 
   // Semantic layer: served from the text-hash cache when the same text was scored
   // under the same engine version, so those two metrics never drift.
@@ -135,7 +145,7 @@ export async function runEngine(extracted, invokeLLM, cache = null) {
 
   if (!semantic) {
     semantic = await invokeLLM({
-      prompt: semanticPrompt(extracted, deterministic),
+      prompt: semanticPrompt(cleaned, deterministic),
       response_json_schema: SEMANTIC_SCHEMA,
       temperature: 0,
     });

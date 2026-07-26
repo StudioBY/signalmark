@@ -4,7 +4,7 @@
  * All calibration constants are explicit and versioned via ENGINE_VERSION.
  */
 
-export const ENGINE_VERSION = "2.1.0-deterministic";
+export const ENGINE_VERSION = "2.2.1-deterministic";
 
 /** Removes URLs before any metric is computed — they are not language. */
 export function stripUrls(text) {
@@ -16,6 +16,16 @@ export function stripUrls(text) {
 /** Removes hashtag runs (used for repetition analysis only). */
 export function stripHashtags(text) {
   return text.replace(/#[\p{L}\p{N}_]+/gu, " ");
+}
+
+/**
+ * The cleaned corpus the metrics are computed on: URLs and hashtag runs removed.
+ * Anything downstream that describes the text (the semantic layer) must read this,
+ * never the raw scrape — otherwise findings can quote a stripped URL.
+ */
+export function cleanSurfaces({ headline = "", about = "", posts = "" }) {
+  const clean = (t) => stripHashtags(stripUrls(t)).replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  return { headline: clean(headline), about: clean(about), posts: clean(posts) };
 }
 
 const STOPWORDS = new Set(
@@ -125,6 +135,52 @@ export function repetitionProfile(tokens) {
   return { repeat_rate: repeated / grams.length, repeated_phrases };
 }
 
+/**
+ * Display-only tokenizer. Unlike `tokenize` (which feeds the metrics and must not change),
+ * it keeps currency/number expressions such as "$15M", "10k" or "3.5%" as single tokens and
+ * preserves their original casing, so repeated phrases read the way the author wrote them.
+ */
+const DISPLAY_TOKEN_RE = /[$€£₪]\s?\d[\d.,]*\s?(?:k|m|bn|b|x)?|\d[\d.,]*\s?(?:%|k|m|bn|b|x)?|[a-zà-ÿ][a-zà-ÿ'’\-]*/gi;
+
+function displayTokens(text) {
+  return [...text.matchAll(DISPLAY_TOKEN_RE)].map((m) => {
+    const raw = m[0].replace(/\s+/g, "");
+    return { raw, norm: raw.toLowerCase() };
+  });
+}
+
+/**
+ * Repeated phrases for display: overlapping repeated n-grams are merged into the single
+ * longest phrase they form ("a 15 m" + "15 m business" -> "a $15M business"). This is an
+ * extraction/presentation concern only — `repetitionProfile` still drives the score.
+ */
+export function mergedRepeatedPhrases(text, n = 3, limit = 5) {
+  const toks = displayTokens(stripHashtags(text));
+  const norms = toks.map((t) => t.norm);
+  const counts = new Map();
+  for (let i = 0; i + n <= norms.length; i++) {
+    const g = norms.slice(i, i + n).join(" ");
+    counts.set(g, (counts.get(g) || 0) + 1);
+  }
+  const repeated = new Set(
+    [...counts.entries()]
+      .filter(([g, c]) => c > 1 && g.split(" ").some((w) => !STOPWORDS.has(w)))
+      .map(([g]) => g)
+  );
+
+  const phrases = new Map();
+  let i = 0;
+  while (i + n <= norms.length) {
+    if (!repeated.has(norms.slice(i, i + n).join(" "))) { i++; continue; }
+    let end = i + n; // exclusive
+    while (end < norms.length && repeated.has(norms.slice(end - n + 1, end + 1).join(" "))) end++;
+    const key = norms.slice(i, end).join(" ");
+    if (!phrases.has(key)) phrases.set(key, toks.slice(i, end).map((t) => t.raw).join(" "));
+    i = end - n + 1;
+  }
+  return [...phrases.values()].sort((a, b) => b.length - a.length || a.localeCompare(b)).slice(0, limit);
+}
+
 function phraseHits(text, phrases) {
   const hay = ` ${text.toLowerCase().replace(/\s+/g, " ")} `;
   const hits = [];
@@ -164,7 +220,8 @@ export function computeDeterministicMetrics({ headline = "", about = "", posts =
   const ttr = mattr(tokens);
   const evidence = countEvidenceMarkers(text);
   const evidencePer100 = per100(evidence);
-  const { repeat_rate, repeated_phrases } = repetitionProfile(tokenize(stripHashtags(text)));
+  const { repeat_rate } = repetitionProfile(tokenize(stripHashtags(text)));
+  const repeated_phrases = mergedRepeatedPhrases(text);
   const boiler = phraseHits(text, BOILERPLATE);
   const filler = phraseHits(text, FILLER);
   const boilerPer100 = per100(boiler.total);
