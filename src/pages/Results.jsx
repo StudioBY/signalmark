@@ -7,6 +7,7 @@ import MetricCard from "@/components/signal/MetricCard";
 import MetricRadar from "@/components/signal/MetricRadar";
 import ReportBody from "@/components/signal/ReportBody";
 import EmailGate from "@/components/signal/EmailGate";
+import ReportSubject from "@/components/signal/ReportSubject";
 
 export default function Results() {
   const id = new URLSearchParams(window.location.search).get("id");
@@ -45,7 +46,7 @@ export default function Results() {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.32em] text-neutral-400">Report</p>
-            <p className="mt-3 text-[11px] uppercase tracking-[0.32em] text-[#1B2430]">{subjectLabel}</p>
+            <ReportSubject name={subjectLabel} photoUrl={analysis.photo_url} />
           </div>
           <Link to="/" className="text-[11px] uppercase tracking-[0.2em] text-neutral-400 hover:text-[#1B2430]">
             New analysis

@@ -46,6 +46,7 @@ export default async function (req) {
     const record = await base44.entities.Analysis.create({
       profile_url: extracted.profile_url,
       full_name: extracted.full_name,
+      photo_url: extracted.photo_url || '',
       headline: extracted.headline,
       about: extracted.about,
       posts: inlinePosts ? extracted.posts : '',

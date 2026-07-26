@@ -60,9 +60,15 @@ export async function fetchProfileText(profileUrl, token) {
     .slice(0, MAX_POSTS)
     .map((p) => p.text);
 
+  const fullName =
+    p.fullName ||
+    p.fullname ||
+    [p.firstName || p.first_name, p.lastName || p.last_name].filter(Boolean).join(" ").trim();
+
   return {
     profile_url: url,
-    full_name: p.fullName || [p.firstName, p.lastName].filter(Boolean).join(" ") || slug,
+    full_name: fullName || slug,
+    photo_url: p.profile_picture_url || p.profilePicture || p.profilePicUrl || p.picture || "",
     headline,
     about,
     posts: postTexts.join("\n\n---\n\n"),

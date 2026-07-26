@@ -11,6 +11,9 @@
     "full_name": {
       "type": "string"
     },
+    "photo_url": {
+      "type": "string"
+    },
     "posts_count": {
       "type": "number"
     },
