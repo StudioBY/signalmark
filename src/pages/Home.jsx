@@ -2,18 +2,23 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import AnalyzeForm from "@/components/signal/AnalyzeForm";
-import { analyzeProfile } from "@/lib/analyzeProfile";
+import UrlForm from "@/components/signal/UrlForm";
 
 export default function Home() {
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const run = async (input) => {
+  const run = async (profileUrl) => {
     setBusy(true);
-    const result = await analyzeProfile(input);
-    const record = await base44.entities.Analysis.create({ ...input, ...result, unlocked: false });
-    navigate(`/results?id=${record.id}`);
+    setError("");
+    try {
+      const res = await base44.functions.invoke("analyzeLinkedinProfile", { profile_url: profileUrl });
+      navigate(`/results?id=${res.data.analysis.id}`);
+    } catch (e) {
+      setError(e?.response?.data?.error || "The profile could not be retrieved. Check the URL and try again.");
+      setBusy(false);
+    }
   };
 
   return (
@@ -32,20 +37,14 @@ export default function Home() {
           </h1>
           <p className="mt-6 max-w-lg text-[15px] font-light leading-relaxed text-neutral-500">
             Five text-derived signals — consistency, evidence density, topical focus, lexical
-            distinctiveness and redundancy — computed from your actual headline, About section and
-            recent posts. No rubric grading, no opinions.
+            distinctiveness and redundancy — computed from the headline, About section and recent
+            posts of any public profile. No rubric grading, no opinions.
           </p>
         </motion.div>
 
         <div className="mt-20">
-          <AnalyzeForm onSubmit={run} busy={busy} />
+          <UrlForm onSubmit={run} busy={busy} error={error} />
         </div>
-
-        {busy && (
-          <p className="mt-10 text-[12px] uppercase tracking-[0.2em] text-neutral-400">
-            Parsing text · extracting signals
-          </p>
-        )}
       </div>
     </div>
   );
