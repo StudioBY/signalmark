@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { secrets } from 'base44:runtime';
 import { fetchProfileText } from '../../shared/apifyLinkedin.ts';
 import { runEngine } from '../../shared/linguisticEngine.ts';
+import { createSemanticCache } from '../../shared/semanticCache.ts';
 
 export default async function (req) {
   try {
@@ -24,8 +25,10 @@ export default async function (req) {
     }
 
     // 2. Deterministic metrics in JS + semantic metrics via the model, composite computed in JS
-    const result = await runEngine(extracted, (args) =>
-      base44.integrations.Core.InvokeLLM(args)
+    const result = await runEngine(
+      extracted,
+      (args) => base44.integrations.Core.InvokeLLM(args),
+      createSemanticCache(base44)
     );
 
     // 3. Persist and return the record that populates the report UI

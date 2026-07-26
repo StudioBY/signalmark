@@ -1,0 +1,25 @@
+{
+  "name": "SemanticCache",
+  "type": "object",
+  "properties": {
+    "cache_key": {
+      "type": "string",
+      "description": "SHA-256 of engine_version + headline + about + posts"
+    },
+    "engine_version": {
+      "type": "string"
+    },
+    "payload": {
+      "type": "string",
+      "description": "JSON-serialized semantic layer output"
+    },
+    "hits": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "cache_key",
+    "payload"
+  ]
+}

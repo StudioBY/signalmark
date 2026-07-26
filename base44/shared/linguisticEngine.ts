@@ -1,4 +1,5 @@
 import { computeDeterministicMetrics, ENGINE_VERSION } from './textMetrics.ts';
+import { semanticCacheKey } from './semanticCache.ts';
 
 export { ENGINE_VERSION };
 
@@ -123,14 +124,22 @@ const clampScore = (n) => Math.max(0, Math.min(100, Math.round(Number(n) || 0)))
  * Runs the full engine: deterministic metrics in JS, two semantic metrics via the model,
  * composite computed arithmetically from WEIGHTS.
  */
-export async function runEngine(extracted, invokeLLM) {
+export async function runEngine(extracted, invokeLLM, cache = null) {
   const deterministic = computeDeterministicMetrics(extracted);
 
-  const semantic = await invokeLLM({
-    prompt: semanticPrompt(extracted, deterministic),
-    response_json_schema: SEMANTIC_SCHEMA,
-    temperature: 0,
-  });
+  // Semantic layer: served from the text-hash cache when the same text was scored
+  // under the same engine version, so those two metrics never drift.
+  const cacheKey = cache ? await semanticCacheKey(ENGINE_VERSION, extracted) : null;
+  let semantic = cacheKey ? await cache.get(cacheKey) : null;
+
+  if (!semantic) {
+    semantic = await invokeLLM({
+      prompt: semanticPrompt(extracted, deterministic),
+      response_json_schema: SEMANTIC_SCHEMA,
+      temperature: 0,
+    });
+    if (cacheKey) await cache.set(cacheKey, ENGINE_VERSION, semantic);
+  }
 
   const scores = {
     message_consistency: clampScore(semantic.message_consistency),
