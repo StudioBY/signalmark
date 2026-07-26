@@ -8,6 +8,7 @@ import MetricRadar from "@/components/signal/MetricRadar";
 import ReportBody from "@/components/signal/ReportBody";
 import EmailGate from "@/components/signal/EmailGate";
 import ReportSubject from "@/components/signal/ReportSubject";
+import { stripEmDashes } from "@/lib/noEmDash";
 
 export default function Results() {
   const id = new URLSearchParams(window.location.search).get("id");
@@ -55,7 +56,7 @@ export default function Results() {
 
         {limitedCorpus && (
           <p className="mt-10 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
-            Limited corpus — {postsCount} posts analyzed. Signals may be less stable.
+            Limited corpus: {postsCount} posts analyzed. Signals may be less stable.
           </p>
         )}
 
@@ -67,9 +68,9 @@ export default function Results() {
             <ScoreDial score={analysis.overall_score || 0} />
           </div>
           <div>
-            <h1 className="text-[26px] font-light leading-snug tracking-tight">{analysis.verdict_title}</h1>
+            <h1 className="text-[26px] font-light leading-snug tracking-tight">{stripEmDashes(analysis.verdict_title)}</h1>
             <p className="mt-5 text-[16px] font-light leading-[1.7] text-neutral-500">
-              {analysis.verdict_summary}
+              {stripEmDashes(analysis.verdict_summary)}
             </p>
           </div>
         </motion.div>

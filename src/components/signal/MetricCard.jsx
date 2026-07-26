@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { stripEmDashes } from "@/lib/noEmDash";
 
 export default function MetricCard({ metric, index = 0 }) {
   return (
@@ -22,7 +23,7 @@ export default function MetricCard({ metric, index = 0 }) {
         />
       </div>
       {metric.observation && (
-        <p className="mt-4 text-[15px] leading-[1.7] text-neutral-500 font-light">{metric.observation}</p>
+        <p className="mt-4 text-[15px] leading-[1.7] text-neutral-500 font-light">{stripEmDashes(metric.observation)}</p>
       )}
     </motion.div>
   );

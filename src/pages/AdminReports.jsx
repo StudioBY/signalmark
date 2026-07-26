@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 
 const subjectLabel = (a) => {
   const slug = (a.profile_url || "").replace(/\/+$/, "").split("/in/")[1];
-  return a.full_name || (slug ? `linkedin.com/in/${slug}` : "—");
+  return a.full_name || (slug ? `linkedin.com/in/${slug}` : "Unknown subject");
 };
 
 export default function AdminReports() {
@@ -46,7 +46,7 @@ export default function AdminReports() {
                 {new Date(a.created_date).toLocaleDateString()}
               </span>
               <span className="flex-1 truncate text-[16px] font-light">{subjectLabel(a)}</span>
-              <span className="text-lg font-light tabular-nums">{a.overall_score ?? "—"}</span>
+              <span className="text-lg font-light tabular-nums">{a.overall_score ?? "n/a"}</span>
             </Link>
           ))}
           {rows.length === 0 && (

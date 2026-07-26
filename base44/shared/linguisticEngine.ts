@@ -1,5 +1,6 @@
 import { computeDeterministicMetrics, cleanSurfaces, ENGINE_VERSION } from './textMetrics.ts';
 import { semanticCacheKey } from './semanticCache.ts';
+import { stripEmDashesDeep } from './noEmDash.ts';
 
 export { ENGINE_VERSION };
 
@@ -87,6 +88,8 @@ Rubric, applied literally:
 
 dominant_topics: up to 5 noun-phrase topics, ordered by measured prominence, taken from the text.
 
+TYPOGRAPHIC LAW, never use an em dash (—) or an en dash (–) in ANY text you produce: observations, verdict_title, verdict_summary, finding titles and bodies, revised lines and rationales. Restructure the sentence with a comma, colon, period or parentheses instead. Regular hyphens inside compound words ("type-token ratio", "results-driven") are correct and must be kept.
+
 Each observation: one or two sentences, citing concrete wording from the text. No advice, no praise.
 
 verdict_title: max 8 words, factual, no hype. Example register: "Consistent positioning, thin quantified evidence".
@@ -173,7 +176,8 @@ export async function runEngine(extracted, invokeLLM, cache = null) {
     redundancy: `Trigram repeat rate ${deterministic.stats.trigram_repeat_rate}; ${deterministic.stats.filler_per_100_words} filler markers per 100 words.`,
   };
 
-  return {
+  // Post-processing pass: no em dash survives into storage, display, PDF or email.
+  return stripEmDashesDeep({
     engine_version: ENGINE_VERSION,
     overall_score,
     verdict_title: semantic.verdict_title || '',
@@ -192,5 +196,5 @@ export async function runEngine(extracted, invokeLLM, cache = null) {
     },
     signal_findings: semantic.signal_findings || [],
     rewrites: semantic.rewrites || [],
-  };
+  });
 }

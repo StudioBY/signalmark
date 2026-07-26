@@ -17,7 +17,7 @@ export default function Home() {
       const res = await base44.functions.invoke("analyzeLinkedinProfile", { profile_url: profileUrl });
       navigate(`/results?id=${res.data.analysis.id}`);
     } catch (e) {
-      setError("Analysis failed — try again");
+      setError("Analysis failed, try again");
       setBusy(false);
     }
   };
@@ -37,8 +37,8 @@ export default function Home() {
             A measurement of how your profile writes.
           </h1>
           <p className="mt-6 max-w-lg text-[17px] font-light leading-[1.7] text-neutral-500">
-            Five text-derived signals — consistency, evidence density, topical focus, lexical
-            distinctiveness and redundancy — computed from the headline, About section and recent
+            Five text-derived signals (consistency, evidence density, topical focus, lexical
+            distinctiveness and redundancy), computed from the headline, About section and recent
             posts of any public profile. No rubric grading, no opinions.
           </p>
         </motion.div>
