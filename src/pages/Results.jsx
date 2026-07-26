@@ -11,9 +11,11 @@ import EmailGate from "@/components/signal/EmailGate";
 export default function Results() {
   const id = new URLSearchParams(window.location.search).get("id");
   const [analysis, setAnalysis] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (id) base44.entities.Analysis.get(id).then(setAnalysis);
+    base44.auth.me().then((u) => setIsAdmin(u?.role === "admin")).catch(() => setIsAdmin(false));
   }, [id]);
 
   if (!analysis) {
@@ -74,7 +76,7 @@ export default function Results() {
         </div>
 
         <div className="mt-28">
-          {analysis.unlocked ? (
+          {analysis.unlocked || isAdmin ? (
             <ReportBody analysis={analysis} />
           ) : (
             <div className="relative">
