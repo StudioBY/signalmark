@@ -15,7 +15,7 @@ export default function AnalysisProgress({ error, onRetry }) {
   if (error) {
     return (
       <div className="border-t border-neutral-200 pt-8">
-        <p className="max-w-md text-[15px] font-light leading-relaxed text-neutral-500">{error}</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-neutral-500">{error}</p>
         <button
           onClick={onRetry}
           className="mt-8 text-[11px] uppercase tracking-[0.22em] text-neutral-500 transition-colors hover:text-[#1B2430]"

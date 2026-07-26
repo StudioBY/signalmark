@@ -49,10 +49,16 @@ export async function fetchProfileText(profileUrl, token) {
   const headline = p.headline || p.occupation || p.subTitle || "";
   const about = p.about || p.summary || p.publicIdentifierSummary || p.description || "";
 
+  // Keep only what the engine reads — post text (and its date). All per-post metadata
+  // (reactions, comments, images, author and share objects) is dropped here, never stored.
   const postTexts = postItems
-    .map((item) => item.text || item.postText || item.content || item?.post?.text || "")
-    .filter((t) => t && t.trim().length > 30)
-    .slice(0, MAX_POSTS);
+    .map((item) => ({
+      text: item.text || item.postText || item.content || item?.post?.text || "",
+      date: item.posted_at?.date || item.postedAt || item.date || "",
+    }))
+    .filter((p) => p.text && p.text.trim().length > 30)
+    .slice(0, MAX_POSTS)
+    .map((p) => p.text);
 
   return {
     profile_url: url,

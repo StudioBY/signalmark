@@ -17,7 +17,7 @@ export default function Home() {
       const res = await base44.functions.invoke("analyzeLinkedinProfile", { profile_url: profileUrl });
       navigate(`/results?id=${res.data.analysis.id}`);
     } catch (e) {
-      setError(e?.response?.data?.error || "The profile could not be retrieved. Check the URL and try again.");
+      setError("Analysis failed — try again");
       setBusy(false);
     }
   };

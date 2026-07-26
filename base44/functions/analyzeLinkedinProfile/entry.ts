@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { secrets } from 'base44:runtime';
 import { fetchProfileText, normalizeProfileUrl } from '../../shared/apifyLinkedin.ts';
 import { createScrapeCache } from '../../shared/scrapeCache.ts';
+import { fitsInline, uploadText } from '../../shared/largeText.ts';
 import { runEngine } from '../../shared/linguisticEngine.ts';
 import { createSemanticCache } from '../../shared/semanticCache.ts';
 
@@ -39,13 +40,16 @@ export default async function (req) {
       createSemanticCache(base44)
     );
 
-    // 3. Persist and return the record that populates the report UI
+    // 3. Persist and return the record that populates the report UI.
+    //    Oversized corpora go to file storage rather than the inline field.
+    const inlinePosts = fitsInline(extracted.posts);
     const record = await base44.entities.Analysis.create({
       profile_url: extracted.profile_url,
       full_name: extracted.full_name,
       headline: extracted.headline,
       about: extracted.about,
-      posts: extracted.posts,
+      posts: inlinePosts ? extracted.posts : '',
+      corpus_url: inlinePosts ? '' : await uploadText(base44, extracted.posts, 'corpus.txt', 'text/plain'),
       posts_count: extracted.posts_count,
       engine_version: result.engine_version,
       ...result,

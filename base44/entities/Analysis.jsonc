@@ -23,6 +23,10 @@
     "posts": {
       "type": "string"
     },
+    "corpus_url": {
+      "type": "string",
+      "description": "URL of the corpus JSON file, used when the corpus is too large to store inline"
+    },
     "overall_score": {
       "type": "number"
     },
@@ -149,5 +153,6 @@
       "type": "boolean",
       "default": false
     }
-  }
+  },
+  "required": []
 }

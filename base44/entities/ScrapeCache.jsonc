@@ -12,7 +12,11 @@
     },
     "payload": {
       "type": "string",
-      "description": "JSON-serialized extracted profile text + posts"
+      "description": "JSON-serialized trimmed corpus, stored inline when small enough"
+    },
+    "payload_url": {
+      "type": "string",
+      "description": "URL of the corpus JSON file, used when the corpus is too large to store inline"
     },
     "hits": {
       "type": "number",
@@ -20,7 +24,6 @@
     }
   },
   "required": [
-    "profile_url",
-    "payload"
+    "profile_url"
   ]
 }
