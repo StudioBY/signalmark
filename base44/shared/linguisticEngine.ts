@@ -5,11 +5,11 @@ export { ENGINE_VERSION };
 
 /** Absolute law. Composite is computed in JS from these weights, never by the model. */
 export const WEIGHTS = {
-  message_consistency: 0.25,
+  message_consistency: 0.30,
   evidence_density: 0.25,
-  topical_focus: 0.2,
-  lexical_distinctiveness: 0.2,
-  redundancy: 0.1,
+  topical_focus: 0.20,
+  lexical_distinctiveness: 0.15,
+  redundancy: 0.10,
 };
 
 const LABELS = {
@@ -93,6 +93,7 @@ verdict_title: max 8 words, factual, no hype. Example register: "Consistent posi
 verdict_summary: exactly 2 sentences stating what the score set means. Reference the measured statistics below, not intuition.
 
 signal_findings: exactly 4 findings (short title + 2-3 analytical sentences). Ground each finding in the MEASURED STATISTICS below or in verbatim text. Never invent a number: only cite figures present in those statistics.
+POLARITY LAW for the redundancy finding: title it exactly "Redundancy Control", and phrase it so that a HIGH score means LESS repetition (efficient compression) and a LOW score means MORE repetition. Never describe a high redundancy control score as redundant. Register example: "A redundancy control score of 86 indicates efficient compression, with a trigram repeat rate of 0.02."
 
 rewrites: exactly 3 line-level revisions. "original" MUST be a verbatim line from the input text. "revised" must raise a named metric. "rationale": one sentence naming which metric it raises and why.
 
@@ -157,7 +158,7 @@ export async function runEngine(extracted, invokeLLM, cache = null) {
   const observations = {
     message_consistency: semantic.message_consistency_observation || '',
     topical_focus: semantic.topical_focus_observation || '',
-    evidence_density: `${deterministic.stats.evidence_marker_count} quantified markers across ${deterministic.stats.word_count} words (${deterministic.stats.evidence_per_100_words} per 100). Calibration: 4.0 per 100 words scores 100.`,
+    evidence_density: `${deterministic.stats.evidence_marker_count} quantified markers across ${deterministic.stats.word_count} words (${deterministic.stats.evidence_per_100_words} per 100). Calibration: 6.5 per 100 words scores 100.`,
     lexical_distinctiveness: `Type-token ratio ${deterministic.stats.type_token_ratio}; ${deterministic.stats.boilerplate_per_100_words} boilerplate markers per 100 words${deterministic.stats.boilerplate_hits.length ? ` (${deterministic.stats.boilerplate_hits.slice(0, 3).join(', ')})` : ''}.`,
     redundancy: `Trigram repeat rate ${deterministic.stats.trigram_repeat_rate}; ${deterministic.stats.filler_per_100_words} filler markers per 100 words.`,
   };

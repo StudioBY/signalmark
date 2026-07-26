@@ -4,7 +4,19 @@
  * All calibration constants are explicit and versioned via ENGINE_VERSION.
  */
 
-export const ENGINE_VERSION = "2.0.0-deterministic";
+export const ENGINE_VERSION = "2.1.0-deterministic";
+
+/** Removes URLs before any metric is computed — they are not language. */
+export function stripUrls(text) {
+  return text
+    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, " ")
+    .replace(/\b[a-z0-9-]+\.(?:com|net|org|io|co|ai|me|ly|in)\/\S*/gi, " ");
+}
+
+/** Removes hashtag runs (used for repetition analysis only). */
+export function stripHashtags(text) {
+  return text.replace(/#[\p{L}\p{N}_]+/gu, " ");
+}
 
 const STOPWORDS = new Set(
   ("a,about,above,after,all,also,am,an,and,any,are,as,at,be,because,been,before,being,but,by,can,could,did,do,does,doing,down,during,each,few,for,from,further,had,has,have,having,he,her,here,hers,him,his,how,i,if,in,into,is,it,its,itself,just,me,more,most,my,no,nor,not,now,of,off,on,once,only,or,other,our,ours,out,over,own,same,she,should,so,some,such,than,that,the,their,theirs,them,then,there,these,they,this,those,through,to,too,under,until,up,very,was,we,were,what,when,where,which,while,who,whom,why,will,with,would,you,your,yours").split(",")
@@ -138,12 +150,12 @@ export function contentFrequencies(tokens) {
 /**
  * Computes the three deterministic metrics + the raw lexical statistics.
  * Calibration (explicit, so results are auditable):
- *   evidence_density        4.0 markers / 100 words  -> 100
+ *   evidence_density        6.5 markers / 100 words  -> 100
  *   lexical_distinctiveness MATTR 0.75 -> 100 ; each boilerplate hit / 100 words costs 12 pts
  *   redundancy              trigram repeat rate 0.15 -> 0 ; filler 3 / 100 words -> -30
  */
 export function computeDeterministicMetrics({ headline = "", about = "", posts = "" }) {
-  const text = [headline, about, posts].filter(Boolean).join("\n\n");
+  const text = stripUrls([headline, about, posts].filter(Boolean).join("\n\n"));
   const tokens = tokenize(text);
   const wordCount = tokens.filter((t) => !/^\d/.test(t)).length || 1;
   const sents = sentences(text);
@@ -152,13 +164,13 @@ export function computeDeterministicMetrics({ headline = "", about = "", posts =
   const ttr = mattr(tokens);
   const evidence = countEvidenceMarkers(text);
   const evidencePer100 = per100(evidence);
-  const { repeat_rate, repeated_phrases } = repetitionProfile(tokens);
+  const { repeat_rate, repeated_phrases } = repetitionProfile(tokenize(stripHashtags(text)));
   const boiler = phraseHits(text, BOILERPLATE);
   const filler = phraseHits(text, FILLER);
   const boilerPer100 = per100(boiler.total);
   const fillerPer100 = per100(filler.total);
 
-  const evidence_density = Math.round(rampUp(evidencePer100, 4.0));
+  const evidence_density = Math.round(rampUp(evidencePer100, 6.5));
   const lexical_distinctiveness = Math.round(
     clamp(rampUp(ttr, 0.75) - boilerPer100 * 12)
   );
