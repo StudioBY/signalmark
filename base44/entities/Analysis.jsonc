@@ -2,6 +2,15 @@
   "name": "Analysis",
   "type": "object",
   "properties": {
+    "profile_url": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "posts_count": {
+      "type": "number"
+    },
     "headline": {
       "type": "string"
     },
@@ -104,8 +113,5 @@
       "type": "boolean",
       "default": false
     }
-  },
-  "required": [
-    "headline"
-  ]
+  }
 }
