@@ -2,6 +2,9 @@
   "name": "Analysis",
   "type": "object",
   "properties": {
+    "engine_version": {
+      "type": "string"
+    },
     "profile_url": {
       "type": "string"
     },
@@ -43,6 +46,12 @@
           "score": {
             "type": "number"
           },
+          "weight": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string"
+          },
           "observation": {
             "type": "string"
           }
@@ -66,16 +75,43 @@
     "lexical_stats": {
       "type": "object",
       "properties": {
+        "word_count": {
+          "type": "number"
+        },
         "type_token_ratio": {
           "type": "number"
         },
         "avg_sentence_length": {
           "type": "number"
         },
+        "evidence_marker_count": {
+          "type": "number"
+        },
         "evidence_per_100_words": {
           "type": "number"
         },
+        "trigram_repeat_rate": {
+          "type": "number"
+        },
+        "boilerplate_per_100_words": {
+          "type": "number"
+        },
+        "filler_per_100_words": {
+          "type": "number"
+        },
         "repeated_phrases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "boilerplate_hits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "top_content_words": {
           "type": "array",
           "items": {
             "type": "string"

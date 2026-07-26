@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { secrets } from 'base44:runtime';
 import { fetchProfileText } from '../../shared/apifyLinkedin.ts';
-import { buildPrompt, SIGNAL_SCHEMA } from '../../shared/linguisticEngine.ts';
+import { runEngine } from '../../shared/linguisticEngine.ts';
 
 export default async function (req) {
   try {
@@ -23,11 +23,10 @@ export default async function (req) {
       );
     }
 
-    // 2. Run the linguistic metric engine on the extracted text
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: buildPrompt(extracted),
-      response_json_schema: SIGNAL_SCHEMA,
-    });
+    // 2. Deterministic metrics in JS + semantic metrics via the model, composite computed in JS
+    const result = await runEngine(extracted, (args) =>
+      base44.integrations.Core.InvokeLLM(args)
+    );
 
     // 3. Persist and return the record that populates the report UI
     const record = await base44.entities.Analysis.create({
@@ -37,6 +36,7 @@ export default async function (req) {
       about: extracted.about,
       posts: extracted.posts,
       posts_count: extracted.posts_count,
+      engine_version: result.engine_version,
       ...result,
       unlocked: false,
     });
