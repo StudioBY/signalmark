@@ -1,3 +1,6 @@
+/** Posts are billed per result — never fetch more than this per analysis. */
+const MAX_POSTS = 20;
+
 const PROFILE_ACTOR = "apimaestro~linkedin-profile-detail";
 const POSTS_ACTOR = "apimaestro~linkedin-profile-posts";
 
@@ -30,7 +33,13 @@ export async function fetchProfileText(profileUrl, token) {
 
   const [profileItems, postItems] = await Promise.all([
     runActor(PROFILE_ACTOR, token, { username: slug }),
-    runActor(POSTS_ACTOR, token, { username: slug, page_number: 1 }).catch(() => []),
+    runActor(POSTS_ACTOR, token, {
+      username: slug,
+      page_number: 1,
+      limit: MAX_POSTS,
+      total_posts: MAX_POSTS,
+      maxItems: MAX_POSTS,
+    }).catch(() => []),
   ]);
 
   const raw = profileItems[0];
@@ -43,7 +52,7 @@ export async function fetchProfileText(profileUrl, token) {
   const postTexts = postItems
     .map((item) => item.text || item.postText || item.content || item?.post?.text || "")
     .filter((t) => t && t.trim().length > 30)
-    .slice(0, 5);
+    .slice(0, MAX_POSTS);
 
   return {
     profile_url: url,

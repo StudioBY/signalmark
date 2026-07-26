@@ -36,6 +36,9 @@ export default function Results() {
   const slug = (analysis.profile_url || "").replace(/\/+$/, "").split("/in/")[1];
   const subjectLabel = analysis.full_name || (slug ? `linkedin.com/in/${slug}` : "");
 
+  const postsCount = analysis.posts_count || 0;
+  const limitedCorpus = postsCount < 10 || (analysis.lexical_stats?.word_count || 0) < 500;
+
   return (
     <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
       <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
@@ -48,6 +51,12 @@ export default function Results() {
             New analysis
           </Link>
         </div>
+
+        {limitedCorpus && (
+          <p className="mt-10 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
+            Limited corpus — {postsCount} posts analyzed. Signals may be less stable.
+          </p>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}

@@ -1,0 +1,26 @@
+{
+  "name": "ScrapeCache",
+  "type": "object",
+  "properties": {
+    "profile_url": {
+      "type": "string",
+      "description": "Normalized LinkedIn profile URL used as the cache key"
+    },
+    "scraped_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "string",
+      "description": "JSON-serialized extracted profile text + posts"
+    },
+    "hits": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "profile_url",
+    "payload"
+  ]
+}

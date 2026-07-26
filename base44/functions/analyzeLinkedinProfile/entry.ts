@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { secrets } from 'base44:runtime';
-import { fetchProfileText } from '../../shared/apifyLinkedin.ts';
+import { fetchProfileText, normalizeProfileUrl } from '../../shared/apifyLinkedin.ts';
+import { createScrapeCache } from '../../shared/scrapeCache.ts';
 import { runEngine } from '../../shared/linguisticEngine.ts';
 import { createSemanticCache } from '../../shared/semanticCache.ts';
 
@@ -13,10 +14,17 @@ export default async function (req) {
     const { profile_url: profileUrl } = await req.json();
     if (!profileUrl) return Response.json({ error: 'profile_url is required' }, { status: 400 });
 
-    const token = secrets.get('APIFY_API_TOKEN');
+    // 1. Profile text: served from the per-profile scrape cache when fresh (no Apify call),
+    //    otherwise scraped once and cached.
+    const { url: normalizedUrl } = normalizeProfileUrl(profileUrl);
+    const scrapeCache = createScrapeCache(base44);
+    let extracted = await scrapeCache.get(normalizedUrl);
 
-    // 1. Scrape the profile text via Apify
-    const extracted = await fetchProfileText(profileUrl, token);
+    if (!extracted) {
+      extracted = await fetchProfileText(profileUrl, secrets.get('APIFY_API_TOKEN'));
+      await scrapeCache.set(normalizedUrl, extracted);
+    }
+
     if (!extracted.headline && !extracted.about && !extracted.posts) {
       return Response.json(
         { error: 'No readable text found on this profile (headline, About and posts are all empty).' },
