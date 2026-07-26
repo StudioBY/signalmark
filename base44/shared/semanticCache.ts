@@ -4,8 +4,13 @@
  * so the two model-scored metrics become fully deterministic across runs.
  */
 
-export async function semanticCacheKey(engineVersion, { headline, about, posts }) {
-  const material = [engineVersion, headline || '', about || '', posts || ''].join('\u0000');
+export async function semanticCacheKey(engineVersion, { headline, about, posts }, scores = null) {
+  // Scores are part of the key: cached prose describes a specific score set, so a
+  // recalibration must never serve narrative written about the previous numbers.
+  const scorePart = scores
+    ? Object.keys(scores).sort().map((k) => `${k}=${scores[k]}`).join(',')
+    : '';
+  const material = [engineVersion, scorePart, headline || '', about || '', posts || ''].join('\u0000');
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material));
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, '0'))

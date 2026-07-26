@@ -4,7 +4,7 @@
  * All calibration constants are explicit and versioned via ENGINE_VERSION.
  */
 
-export const ENGINE_VERSION = "2.2.1-deterministic";
+export const ENGINE_VERSION = "3.0.0-deterministic";
 
 /** Removes URLs before any metric is computed — they are not language. */
 export function stripUrls(text) {
@@ -28,7 +28,7 @@ export function cleanSurfaces({ headline = "", about = "", posts = "" }) {
   return { headline: clean(headline), about: clean(about), posts: clean(posts) };
 }
 
-const STOPWORDS = new Set(
+export const STOPWORDS = new Set(
   ("a,about,above,after,all,also,am,an,and,any,are,as,at,be,because,been,before,being,but,by,can,could,did,do,does,doing,down,during,each,few,for,from,further,had,has,have,having,he,her,here,hers,him,his,how,i,if,in,into,is,it,its,itself,just,me,more,most,my,no,nor,not,now,of,off,on,once,only,or,other,our,ours,out,over,own,same,she,should,so,some,such,than,that,the,their,theirs,them,then,there,these,they,this,those,through,to,too,under,until,up,very,was,we,were,what,when,where,which,while,who,whom,why,will,with,would,you,your,yours").split(",")
 );
 

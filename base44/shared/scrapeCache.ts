@@ -27,16 +27,20 @@ export function createScrapeCache(base44) {
   }
 
   return {
-    /** Returns the cached extraction if it is younger than the TTL, else null. */
+    /**
+     * Returns { extracted, scraped_at } if the cached scrape is younger than the TTL,
+     * else null. `scraped_at` lets callers decide whether a stored report is still canonical.
+     */
     async get(profileUrl) {
       const row = await findRow(profileUrl);
       if (!row) return null;
-      const ageMs = Date.now() - new Date(row.scraped_at || row.created_date).getTime();
+      const scrapedAt = row.scraped_at || row.created_date;
+      const ageMs = Date.now() - new Date(scrapedAt).getTime();
       if (ageMs > SCRAPE_TTL_DAYS * 24 * 60 * 60 * 1000) return null;
       const extracted = await readPayload(row);
       if (!extracted) return null;
       await store.update(row.id, { hits: (row.hits || 0) + 1 });
-      return extracted;
+      return { extracted, scraped_at: scrapedAt };
     },
 
     async set(profileUrl, extracted) {
