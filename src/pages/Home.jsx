@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import UrlForm from "@/components/signal/UrlForm";
+import PurchaseForm from "@/components/signal/PurchaseForm";
+import SampleReports from "@/components/signal/SampleReports";
+import PlansSection from "@/components/signal/PlansSection";
 import AnalysisProgress from "@/components/signal/AnalysisProgress";
 
 export default function Home() {
@@ -10,14 +12,33 @@ export default function Home() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const run = async (profileUrl) => {
+  const start = async (profileUrl, email) => {
     setBusy(true);
     setError("");
     try {
-      const res = await base44.functions.invoke("analyzeLinkedinProfile", { profile_url: profileUrl });
-      navigate(`/results?id=${res.data.analysis.id}`);
+      const res = await base44.functions.invoke("createReportCheckout", {
+        profile_url: profileUrl,
+        email,
+        origin: window.location.origin,
+      });
+
+      // Admin users bypass payment entirely.
+      if (res.data.admin) {
+        const analysis = await base44.functions.invoke("analyzeLinkedinProfile", {
+          profile_url: profileUrl,
+        });
+        navigate(`/results?id=${analysis.data.analysis.id}`);
+        return;
+      }
+
+      if (window.self !== window.top) {
+        setError("Checkout works only from the published app, open it in a new tab");
+        setBusy(false);
+        return;
+      }
+      window.location.href = res.data.checkout_url;
     } catch (e) {
-      setError("Analysis failed, try again");
+      setError(e?.response?.data?.error || "Could not start checkout, try again");
       setBusy(false);
     }
   };
@@ -45,11 +66,14 @@ export default function Home() {
 
         <div className="mt-20">
           {busy || error ? (
-            <AnalysisProgress error={error} onRetry={() => setError("")} />
+            <AnalysisProgress error={error} onRetry={() => { setError(""); setBusy(false); }} />
           ) : (
-            <UrlForm onSubmit={run} busy={busy} />
+            <PurchaseForm onSubmit={start} busy={busy} />
           )}
         </div>
+
+        <SampleReports />
+        <PlansSection />
       </div>
     </div>
   );

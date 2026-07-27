@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Results from './pages/Results';
 import AdminReports from './pages/AdminReports';
+import SampleReport from './pages/SampleReport';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/results" element={<Results />} />
+      <Route path="/sample/:slug" element={<SampleReport />} />
       <Route path="/admin/reports" element={<AdminReports />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

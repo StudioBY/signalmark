@@ -1,0 +1,42 @@
+{
+  "name": "Purchase",
+  "type": "object",
+  "properties": {
+    "profile_url": {
+      "type": "string",
+      "description": "Normalized LinkedIn profile URL the report was purchased for"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email collected before checkout, receives the PDF"
+    },
+    "ip": {
+      "type": "string",
+      "description": "Client IP, used for the daily abuse guard"
+    },
+    "stripe_session_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "delivered",
+        "refunded"
+      ],
+      "default": "pending"
+    },
+    "analysis_id": {
+      "type": "string"
+    },
+    "amount_cents": {
+      "type": "number",
+      "default": 100
+    }
+  },
+  "required": [
+    "profile_url",
+    "email"
+  ]
+}
