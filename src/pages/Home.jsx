@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
@@ -11,12 +11,29 @@ import Footer from "@/components/signal/Footer";
 export default function Home() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [mode, setMode] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    base44.functions
+      .invoke("appMode", {})
+      .then((res) => setMode(res.data.launch_mode))
+      .catch(() => setMode("paid"));
+  }, []);
 
   const start = async (profileUrl, email) => {
     setBusy(true);
     setError("");
     try {
+      if (mode === "free_preview") {
+        const res = await base44.functions.invoke("runFreeReport", {
+          profile_url: profileUrl,
+          email,
+        });
+        navigate(`/results?id=${res.data.analysis.id}&deliver=1`);
+        return;
+      }
+
       const res = await base44.functions.invoke("createReportCheckout", {
         profile_url: profileUrl,
         email,
@@ -39,7 +56,7 @@ export default function Home() {
       }
       window.location.href = res.data.checkout_url;
     } catch (e) {
-      setError(e?.response?.data?.error || "Could not start checkout, try again");
+      setError(e?.response?.data?.error || "Could not run the analysis, try again");
       setBusy(false);
     }
   };
@@ -71,12 +88,12 @@ export default function Home() {
           {busy || error ? (
             <AnalysisProgress error={error} onRetry={() => { setError(""); setBusy(false); }} />
           ) : (
-            <PurchaseForm onSubmit={start} busy={busy} />
+            mode && <PurchaseForm onSubmit={start} busy={busy} mode={mode} />
           )}
         </div>
 
         <SampleReports />
-        <PlansSection />
+        <PlansSection mode={mode} />
         <Footer />
       </div>
     </div>

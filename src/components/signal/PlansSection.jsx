@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 
-export default function PlansSection() {
+export default function PlansSection({ mode = "paid" }) {
   const [email, setEmail] = useState("");
   const [joined, setJoined] = useState(false);
 
@@ -17,7 +17,14 @@ export default function PlansSection() {
       <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-400">Plans</p>
 
       <div className="mt-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-[#1B2430]">Single report, $1</p>
+        <div className="flex flex-wrap items-baseline gap-4">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-[#1B2430]">Single report, $1</p>
+          {mode === "free_preview" && (
+            <span className="text-[10px] uppercase tracking-[0.24em] text-neutral-400">
+              Preview: free
+            </span>
+          )}
+        </div>
         <p className="mt-3 max-w-md text-[15px] font-light leading-[1.7] text-neutral-500">
           One full linguistic signal report, delivered on screen and by PDF to your email.
         </p>

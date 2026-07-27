@@ -9,6 +9,7 @@ export default function Results() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
   const sessionId = params.get("session_id");
+  const shouldDeliver = sessionId || params.get("deliver") === "1";
 
   const [analysis, setAnalysis] = useState(null);
   const [sentTo, setSentTo] = useState("");
@@ -29,11 +30,11 @@ export default function Results() {
 
   // PDF delivery runs after the report is on screen and can never block it.
   useEffect(() => {
-    if (!analysis?.id || !sessionId) return;
+    if (!analysis?.id || !shouldDeliver) return;
     deliverReportPdf(analysis, analysis.full_name).then((email) => {
       if (email) setSentTo(email);
     });
-  }, [analysis, sessionId]);
+  }, [analysis, shouldDeliver]);
 
   if (failure) {
     return (

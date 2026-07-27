@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import PreviewBanner from "@/components/signal/PreviewBanner";
 
 const PROFILE_RE = /^https?:\/\/(?:[a-z]{2,3}\.)?linkedin\.com\/in\/[A-Za-z0-9\-_%À-ÿ.]+\/?$/i;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function PurchaseForm({ onSubmit, busy }) {
+export default function PurchaseForm({ onSubmit, busy, mode = "paid" }) {
+  const free = mode === "free_preview";
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -26,6 +28,7 @@ export default function PurchaseForm({ onSubmit, busy }) {
 
   return (
     <form onSubmit={submit} className="border-t border-neutral-200 pt-10">
+      {free && <PreviewBanner />}
       <label className="block text-[11px] uppercase tracking-[0.24em] text-neutral-400">
         LinkedIn profile URL
       </label>
@@ -59,7 +62,7 @@ export default function PurchaseForm({ onSubmit, busy }) {
         disabled={busy}
         className="mt-10 border border-[#1B2430] px-8 py-3 text-[11px] uppercase tracking-[0.24em] text-[#1B2430] transition-colors hover:bg-[#1B2430] hover:text-[#FCFCFB] disabled:opacity-40"
       >
-        {busy ? "Preparing" : "Analyze for $1"}
+        {busy ? "Preparing" : free ? "Analyze for free" : "Analyze for $1"}
       </button>
     </form>
   );

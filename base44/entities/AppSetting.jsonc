@@ -1,0 +1,18 @@
+{
+  "name": "AppSetting",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Setting name, for example LAUNCH_MODE"
+    },
+    "value": {
+      "type": "string",
+      "description": "Setting value. For LAUNCH_MODE: paid or free_preview"
+    }
+  },
+  "required": [
+    "key",
+    "value"
+  ]
+}
