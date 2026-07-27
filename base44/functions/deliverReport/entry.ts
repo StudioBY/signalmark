@@ -34,15 +34,16 @@ export default async function (req) {
         `<p>Composite score: ${analysis?.overall_score ?? ''} out of 100.<br>${analysis?.verdict_title || ''}</p>`,
         `<p>Download the full report (PDF): <a href="${pdfUrl}">${pdfUrl}</a></p>`,
         `<p>Every number is computed arithmetically from the profile's public text. The same text always produces the same score.</p>`,
+        `<p>SignalMark · A measurement of how your profile writes.</p>`,
       ].join('\n')
     );
 
     try {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: purchase.email,
-        subject: `Your Linguistic Signal Report - ${name}`,
+        subject: `Your SignalMark Report - ${name}`,
         body,
-        from_name: 'Linguistic Signal Score',
+        from_name: 'SignalMark',
       });
     } catch (emailError) {
       console.error('SendEmail failed', emailError);

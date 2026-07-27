@@ -1,6 +1,8 @@
 import { jsPDF } from "jspdf";
 import { stripEmDashes } from "@/lib/noEmDash";
 import { loadGrayscaleDataUrl } from "@/lib/pdfImage";
+import { loadLogoDataUrl } from "@/lib/pdfLogo";
+import { SITE_URL } from "@/lib/brand";
 
 /**
  * Renders the complete report into a PDF, in the same editorial register as the screen:
@@ -169,7 +171,11 @@ class Doc {
       this.pdf.setDrawColor(...RULE).setLineWidth(0.6);
       this.pdf.line(MARGIN, HEIGHT - 62, WIDTH - MARGIN, HEIGHT - 62);
       this.pdf.setFont("helvetica", "normal").setFontSize(6.5).setTextColor(...MUTED);
-      this.pdf.text(spaced(`Linguistic signal score · ${site}`), MARGIN, HEIGHT - 46);
+      this.pdf.text(
+        spaced(`SignalMark · Linguistic signal score · ${site}`),
+        MARGIN,
+        HEIGHT - 46
+      );
     }
   }
 }
@@ -179,6 +185,13 @@ export async function buildReportPdf(analysis, displayName) {
   const stats = analysis.lexical_stats || {};
   const name = displayName || analysis.full_name || "";
   const photo = await loadGrayscaleDataUrl(analysis.photo_url);
+
+  // Letterhead mark on page 1, above the label. Only the label block shifts down.
+  const logo = await loadLogoDataUrl(16, INK);
+  if (logo) {
+    d.pdf.addImage(logo.dataUrl, "PNG", MARGIN, d.y - 12, logo.width, logo.height);
+    d.space(logo.height + 12);
+  }
 
   d.label("Linguistic signal report");
   d.space(4);
@@ -258,11 +271,7 @@ export async function buildReportPdf(analysis, displayName) {
     d.space(18);
   }
 
-  const site =
-    typeof window !== "undefined"
-      ? window.location.host.replace(/^www\./, "")
-      : "linguistic-signal-score";
-  d.footers(site);
+  d.footers(SITE_URL);
 
   return d.pdf.output("blob");
 }
