@@ -25,24 +25,23 @@ export default async function (req) {
 
     const body = await req.json();
     const rawUrl = String(body.profile_url || '').trim();
-    const email = String(body.email || '').trim().toLowerCase();
     if (!PROFILE_RE.test(rawUrl)) {
       return Response.json({ error: 'Enter a valid linkedin.com/in/username profile URL.' }, { status: 400 });
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return Response.json({ error: 'Enter a valid email address.' }, { status: 400 });
-    }
 
-    const { url: profileUrl } = normalizeProfileUrl(rawUrl);
-    const ip = clientIp(req);
-
+    // The report is tied to the signed-in account and its verified email.
     let user = null;
     try {
       user = await base44.auth.me();
     } catch (_e) {
       user = null;
     }
-    const isAdmin = user?.role === 'admin';
+    if (!user?.email) return Response.json({ error: 'Sign in to run an analysis.' }, { status: 401 });
+
+    const email = user.email.toLowerCase();
+    const { url: profileUrl } = normalizeProfileUrl(rawUrl);
+    const ip = clientIp(req);
+    const isAdmin = user.role === 'admin';
 
     if (!isAdmin) {
       const byEmail = await base44.asServiceRole.entities.Purchase.filter({ email }, '-created_date', 10);

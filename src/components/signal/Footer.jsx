@@ -13,6 +13,8 @@ export default function Footer() {
         <Link to="/terms#terms" className={LINK}>Terms</Link>
         <span className="text-[11px] text-neutral-300">·</span>
         <Link to="/terms#privacy" className={LINK}>Privacy</Link>
+        <span className="text-[11px] text-neutral-300">·</span>
+        <Link to="/my-reports" className={LINK}>My reports</Link>
       </div>
     </footer>
   );

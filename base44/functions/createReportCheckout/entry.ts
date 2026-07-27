@@ -11,26 +11,26 @@ export default async function (req) {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
     const rawUrl = String(body.profile_url || '').trim();
-    const email = String(body.email || '').trim();
     const origin = String(body.origin || '').replace(/\/+$/, '');
 
     if (!PROFILE_RE.test(rawUrl)) {
       return Response.json({ error: 'Enter a valid linkedin.com/in/username profile URL.' }, { status: 400 });
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return Response.json({ error: 'Enter a valid email address.' }, { status: 400 });
-    }
 
     const { url: profileUrl, slug } = normalizeProfileUrl(rawUrl);
 
-    // Admin users bypass payment entirely.
+    // Sign-in comes before payment: the checkout and the PDF use the verified account email.
     let user = null;
     try {
       user = await base44.auth.me();
     } catch (_e) {
       user = null;
     }
-    if (user && user.role === 'admin') {
+    if (!user?.email) return Response.json({ error: 'Sign in to run an analysis.' }, { status: 401 });
+    const email = user.email.toLowerCase();
+
+    // Admin users bypass payment entirely.
+    if (user.role === 'admin') {
       return Response.json({ admin: true, profile_url: profileUrl });
     }
 

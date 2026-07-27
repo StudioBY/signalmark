@@ -12,6 +12,7 @@ import AdminReports from './pages/AdminReports';
 import SampleReport from './pages/SampleReport';
 import Methodology from './pages/Methodology';
 import Terms from './pages/Terms';
+import MyReports from './pages/MyReports';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
       <Route path="/sample/:slug" element={<SampleReport />} />
       <Route path="/methodology" element={<Methodology />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/my-reports" element={<MyReports />} />
       <Route path="/admin/reports" element={<AdminReports />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { motion } from "framer-motion";
 import PurchaseForm from "@/components/signal/PurchaseForm";
 import SampleReports from "@/components/signal/SampleReports";
@@ -12,7 +13,9 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState("");
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const resumed = useRef(false);
 
   useEffect(() => {
     base44.functions
@@ -21,14 +24,13 @@ export default function Home() {
       .catch(() => setMode("paid"));
   }, []);
 
-  const start = async (profileUrl, email) => {
+  const run = async (profileUrl) => {
     setBusy(true);
     setError("");
     try {
       if (mode === "free_preview") {
         const res = await base44.functions.invoke("runFreeReport", {
           profile_url: profileUrl,
-          email,
         });
         navigate(`/results?id=${res.data.analysis.id}&deliver=1`);
         return;
@@ -36,7 +38,6 @@ export default function Home() {
 
       const res = await base44.functions.invoke("createReportCheckout", {
         profile_url: profileUrl,
-        email,
         origin: window.location.origin,
       });
 
@@ -60,6 +61,27 @@ export default function Home() {
       setBusy(false);
     }
   };
+
+  // Sign-in is required at submission: the profile URL rides along and the run resumes on return.
+  const start = (profileUrl) => {
+    if (!isAuthenticated) {
+      base44.auth.loginWithProvider(
+        "google",
+        `${window.location.origin}/?profile=${encodeURIComponent(profileUrl)}`
+      );
+      return;
+    }
+    run(profileUrl);
+  };
+
+  useEffect(() => {
+    if (resumed.current || !mode || !isAuthenticated) return;
+    const pending = new URLSearchParams(window.location.search).get("profile");
+    if (!pending) return;
+    resumed.current = true;
+    window.history.replaceState({}, "", "/");
+    run(pending);
+  }, [mode, isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
@@ -88,7 +110,7 @@ export default function Home() {
           {busy || error ? (
             <AnalysisProgress error={error} onRetry={() => { setError(""); setBusy(false); }} />
           ) : (
-            mode && <PurchaseForm onSubmit={start} busy={busy} mode={mode} />
+            mode && <PurchaseForm onSubmit={start} busy={busy} mode={mode} signedIn={isAuthenticated} />
           )}
         </div>
 
