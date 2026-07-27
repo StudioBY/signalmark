@@ -23,17 +23,23 @@ export default function SampleReports() {
 
   return (
     <section id="sample-reports" className="mt-28 scroll-mt-16 border-t border-neutral-200 pt-12">
-      <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-400">Sample reports</p>
+      <p className="text-[20px] font-light leading-snug tracking-tight text-[#1B2430]">
+        Fame isn't signal. Writing is.
+      </p>
+      <p className="mt-6 text-[11px] uppercase tracking-[0.24em] text-neutral-400">Sample reports</p>
       <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 md:grid-cols-5">
         {samples.map((s) => (
           <Link key={s.slug} to={`/sample/${s.slug}`} className="group block text-left">
-            {s.photo_url && (
-              <img
-                src={s.photo_url}
-                alt=""
-                className="mb-4 h-14 w-14 rounded-full object-cover grayscale"
-              />
-            )}
+            {/* Fixed-height photo slot keeps every card on the same baseline, photo or not. */}
+            <div className="mb-4 h-14">
+              {s.photo_url && (
+                <img
+                  src={s.photo_url}
+                  alt=""
+                  className="h-14 w-14 rounded-full object-cover grayscale"
+                />
+              )}
+            </div>
             <p className="text-[11px] uppercase leading-[1.5] tracking-[0.18em] text-[#1B2430] group-hover:text-neutral-500">
               {s.name}
             </p>

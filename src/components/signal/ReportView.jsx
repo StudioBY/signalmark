@@ -7,10 +7,17 @@ import MetricRadar from "@/components/signal/MetricRadar";
 import ReportBody from "@/components/signal/ReportBody";
 import ReportSubject from "@/components/signal/ReportSubject";
 import BackLink from "@/components/signal/BackLink";
+import DownloadPdfLink from "@/components/signal/DownloadPdfLink";
 import Footer from "@/components/signal/Footer";
 import { stripEmDashes } from "@/lib/noEmDash";
 
-export default function ReportView({ analysis, sampleLabel = false, displayName = "", sentTo = "" }) {
+export default function ReportView({
+  analysis,
+  sampleLabel = false,
+  displayName = "",
+  sentTo = "",
+  allowDownload = false,
+}) {
   const metrics = analysis.metrics || [];
   const slug = (analysis.profile_url || "").replace(/\/+$/, "").split("/in/")[1];
   const subjectLabel = displayName || analysis.full_name || (slug ? `linkedin.com/in/${slug}` : "");
@@ -38,10 +45,15 @@ export default function ReportView({ analysis, sampleLabel = false, displayName 
           </Link>
         </div>
 
-        {sentTo && (
-          <p className="mt-10 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
-            Report sent to {sentTo}
-          </p>
+        {(sentTo || allowDownload) && (
+          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3">
+            {sentTo && (
+              <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-400">
+                Report sent to {sentTo}
+              </p>
+            )}
+            {allowDownload && <DownloadPdfLink analysis={analysis} displayName={displayName} />}
+          </div>
         )}
 
         {limitedCorpus && (

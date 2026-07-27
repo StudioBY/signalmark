@@ -61,5 +61,5 @@ export default function Results() {
     );
   }
 
-  return <ReportView analysis={analysis} sentTo={sentTo} />;
+  return <ReportView analysis={analysis} sentTo={sentTo} allowDownload />;
 }
