@@ -7,6 +7,7 @@ import PurchaseForm from "@/components/signal/PurchaseForm";
 import SampleReports from "@/components/signal/SampleReports";
 import PlansSection from "@/components/signal/PlansSection";
 import AnalysisProgress from "@/components/signal/AnalysisProgress";
+import BrandMark from "@/components/signal/BrandMark";
 import Footer from "@/components/signal/Footer";
 
 export default function Home() {
@@ -86,6 +87,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
       <div className="mx-auto max-w-3xl px-6 py-24 md:py-32">
+        <div className="mb-12">
+          <BrandMark />
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

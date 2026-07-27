@@ -7,6 +7,7 @@ import MetricRadar from "@/components/signal/MetricRadar";
 import ReportBody from "@/components/signal/ReportBody";
 import ReportSubject from "@/components/signal/ReportSubject";
 import BackLink from "@/components/signal/BackLink";
+import BrandMark from "@/components/signal/BrandMark";
 import DownloadPdfLink from "@/components/signal/DownloadPdfLink";
 import Footer from "@/components/signal/Footer";
 import { stripEmDashes } from "@/lib/noEmDash";
@@ -28,6 +29,9 @@ export default function ReportView({
   return (
     <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
       <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
+        <div className="mb-10">
+          <BrandMark />
+        </div>
         <div className="flex items-start justify-between">
           <div>
             <BackLink
