@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 
-const STAGES = ["Retrieving profile", "Parsing corpus", "Computing signals"];
+/** Labels for the real request stages reported by the caller. */
+const STAGES = {
+  retrieving: "Retrieving public profile",
+  measuring: "Measuring 5 linguistic signals",
+  composing: "Composing your report",
+};
 
-export default function AnalysisProgress({ error, onRetry }) {
-  const [stage, setStage] = useState(0);
-
-  useEffect(() => {
-    if (error) return;
-    const t = setInterval(() => setStage((s) => (s + 1) % STAGES.length), 3200);
-    return () => clearInterval(t);
-  }, [error]);
+export default function AnalysisProgress({ error, onRetry, stage = "retrieving" }) {
 
   if (error) {
     return (
@@ -49,7 +47,7 @@ export default function AnalysisProgress({ error, onRetry }) {
           transition={{ duration: 0.8 }}
           className="text-[11px] uppercase tracking-[0.22em] text-neutral-500"
         >
-          {STAGES[stage]}
+          {STAGES[stage] || STAGES.retrieving}
         </motion.p>
       </div>
     </div>

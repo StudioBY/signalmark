@@ -14,6 +14,8 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState("");
+  // Reflects the actual request in flight, not a timer.
+  const [stage, setStage] = useState("retrieving");
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const resumed = useRef(false);
@@ -28,11 +30,13 @@ export default function Home() {
   const run = async (profileUrl) => {
     setBusy(true);
     setError("");
+    setStage("retrieving");
     try {
       if (mode === "free_preview") {
         const res = await base44.functions.invoke("runFreeReport", {
           profile_url: profileUrl,
         });
+        setStage("composing");
         navigate(`/results?id=${res.data.analysis.id}&deliver=1`);
         return;
       }
@@ -44,9 +48,11 @@ export default function Home() {
 
       // Admin users bypass payment entirely.
       if (res.data.admin) {
+        setStage("measuring");
         const analysis = await base44.functions.invoke("analyzeLinkedinProfile", {
           profile_url: profileUrl,
         });
+        setStage("composing");
         navigate(`/results?id=${analysis.data.analysis.id}`);
         return;
       }
@@ -110,7 +116,7 @@ export default function Home() {
 
         <div className="mt-20">
           {busy || error ? (
-            <AnalysisProgress error={error} onRetry={() => { setError(""); setBusy(false); }} />
+            <AnalysisProgress stage={stage} error={error} onRetry={() => { setError(""); setBusy(false); }} />
           ) : (
             mode && <PurchaseForm onSubmit={start} busy={busy} mode={mode} signedIn={isAuthenticated} />
           )}
