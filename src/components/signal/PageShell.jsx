@@ -6,11 +6,9 @@ import Footer from "@/components/signal/Footer";
 /** Shared frame for the static content pages: title, subtitle, back control, footer. */
 export default function PageShell({ title, subtitle, children }) {
   return (
-    <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
+    <div className="relative min-h-screen bg-[#FCFCFB] text-[#1B2430]">
+      <BrandMark />
       <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
-        <div className="mb-10">
-          <BrandMark />
-        </div>
         <BackLink to="/" label="Back" />
         <h1 className="mt-10 text-[34px] font-extralight leading-[1.15] tracking-tight md:text-[40px]">
           {title}

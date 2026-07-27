@@ -27,11 +27,9 @@ export default function ReportView({
   const limitedCorpus = postsCount < 10 || (analysis.lexical_stats?.word_count || 0) < 500;
 
   return (
-    <div className="min-h-screen bg-[#FCFCFB] text-[#1B2430]">
+    <div className="relative min-h-screen bg-[#FCFCFB] text-[#1B2430]">
+      <BrandMark />
       <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
-        <div className="mb-10">
-          <BrandMark />
-        </div>
         <div className="flex items-start justify-between">
           <div>
             <BackLink
