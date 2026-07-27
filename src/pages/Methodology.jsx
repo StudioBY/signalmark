@@ -99,6 +99,16 @@ export default function Methodology() {
         </p>
       </Section>
 
+      <Section label="Corpus coverage">
+        <p>
+          Sparse profiles are scaled by corpus coverage: the share of the{" "}
+          {c.coverage_surfaces} surfaces that actually carry text, raised to the power of{" "}
+          {c.coverage_exponent}. That factor multiplies message consistency, topical focus,
+          lexical distinctiveness and redundancy control, because a very short text satisfies
+          those three by construction. This is why an almost empty profile cannot score high.
+        </p>
+      </Section>
+
       <Section label="The five signals">
         <div className="space-y-8">
           {SIGNALS.map((s) => (

@@ -4,7 +4,7 @@
  * All calibration constants are explicit and versioned via ENGINE_VERSION.
  */
 
-export const ENGINE_VERSION = "3.1.0-deterministic";
+export const ENGINE_VERSION = "3.2.0-deterministic";
 
 /**
  * The calibration constants of the three lexical metrics, in one auditable place.
@@ -24,7 +24,22 @@ export const CALIBRATION = {
   filler_penalty_rate: 3,
   /** maximum points deducted for filler */
   filler_max_penalty: 30,
+  /** surfaces a complete corpus carries: headline, About section, posts */
+  coverage_surfaces: 3,
+  /** exponent applied to the populated-surface share */
+  coverage_exponent: 2,
 };
+
+/**
+ * Corpus coverage factor: the share of populated surfaces, raised to the coverage
+ * exponent. A single definition, applied to message consistency, topical focus,
+ * lexical distinctiveness and redundancy control, so a near-empty corpus cannot
+ * score high on metrics that tiny texts satisfy by construction.
+ */
+export function corpusCoverage(presentSurfaces) {
+  const share = Math.max(0, Math.min(1, presentSurfaces / CALIBRATION.coverage_surfaces));
+  return share ** CALIBRATION.coverage_exponent;
+}
 
 /** Removes URLs before any metric is computed — they are not language. */
 export function stripUrls(text) {
@@ -63,6 +78,9 @@ const BOILERPLATE = [
   "next level", "empower", "empowering", "unlock", "unlocking", "transformative", "holistic",
   "strategic thinker", "detail oriented", "detail-oriented", "driven professional", "storyteller",
   "helping companies", "helping businesses", "on a mission", "obsessed with", "love what i do",
+  // LinkedIn's auto-generated About template.
+  "experienced", "with a demonstrated history of working in", "skilled in", "strong",
+  "professional with a",
 ];
 
 /** Filler / hedging register. Counts against redundancy control. */
