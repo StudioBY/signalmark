@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import Monogram from "@/components/signal/Monogram";
 
 export default function SampleReports() {
   const [samples, setSamples] = useState([]);
@@ -32,12 +33,18 @@ export default function SampleReports() {
           <Link key={s.slug} to={`/sample/${s.slug}`} className="group block text-left">
             {/* Fixed-height photo slot keeps every card on the same baseline, photo or not. */}
             <div className="mb-4 h-14">
-              {s.photo_url && (
+              {s.photo_url ? (
                 <img
                   src={s.photo_url}
                   alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width="56"
+                  height="56"
                   className="h-14 w-14 rounded-full object-cover grayscale"
                 />
+              ) : (
+                <Monogram name={s.name} />
               )}
             </div>
             <p className="text-[11px] uppercase leading-[1.5] tracking-[0.18em] text-[#1B2430] group-hover:text-neutral-500">

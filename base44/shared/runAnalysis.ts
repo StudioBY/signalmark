@@ -3,6 +3,7 @@ import { createScrapeCache } from './scrapeCache.ts';
 import { fitsInline, uploadText } from './largeText.ts';
 import { runEngine, ENGINE_VERSION } from './linguisticEngine.ts';
 import { createSemanticCache } from './semanticCache.ts';
+import { mirrorPhoto } from './profilePhoto.ts';
 
 export { ENGINE_VERSION, normalizeProfileUrl };
 
@@ -58,7 +59,7 @@ export async function runAnalysis(base44, profileUrl, { apifyToken, forceRefresh
   const record = await base44.asServiceRole.entities.Analysis.create({
     profile_url: extracted.profile_url,
     full_name: extracted.full_name,
-    photo_url: extracted.photo_url || '',
+    photo_url: await mirrorPhoto(base44, extracted.photo_url),
     headline: extracted.headline,
     about: extracted.about,
     posts: inlinePosts ? extracted.posts : '',

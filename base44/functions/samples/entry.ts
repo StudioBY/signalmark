@@ -50,7 +50,8 @@ export default async function (req) {
       samples: entries.map(([s, report]) => ({
         slug: s,
         name: nameOf(report),
-        photo_url: report.photo_url || '',
+        // Never expose a LinkedIn CDN link to the browser: those are signed and expire.
+        photo_url: /licdn\.com|linkedin\.com/i.test(report.photo_url || '') ? '' : report.photo_url || '',
         overall_score: report.overall_score || 0,
       })),
     });
