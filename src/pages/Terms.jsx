@@ -73,7 +73,7 @@ export default function Terms() {
         </p>
         <p>
           To request removal of your email, a report or a cached profile, write to
-          privacy@signalscore.app and the data will be deleted.
+          info@signalmark.com and the data will be deleted.
         </p>
       </Section>
     </PageShell>
