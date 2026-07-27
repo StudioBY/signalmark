@@ -155,6 +155,15 @@
     "unlocked": {
       "type": "boolean",
       "default": false
+    },
+    "is_sample": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, this stored report is served publicly in the SAMPLE REPORTS section"
+    },
+    "sample_name": {
+      "type": "string",
+      "description": "Display name for the sample card and report header, overrides full_name"
     }
   },
   "required": []

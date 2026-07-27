@@ -4,22 +4,27 @@ import { ENGINE_VERSION } from '../../shared/runAnalysis.ts';
 /**
  * Public, free sample reports. Served verbatim from stored analyses:
  * no Apify call, no LLM call, nothing recomputed.
+ *
+ * Which profiles appear is data, not code: any Analysis row on the current
+ * engine version with is_sample = true is listed, ordered by composite score
+ * (highest first). Swapping a persona is a data edit.
  */
-const SAMPLES = [
-  { slug: 'justin-welsh', name: 'Justin Welsh', profile_url: 'https://www.linkedin.com/in/justinwelsh/' },
-  { slug: 'satya-nadella', name: 'Satya Nadella', profile_url: 'https://www.linkedin.com/in/satyanadella/' },
-  { slug: 'reid-hoffman', name: 'Reid Hoffman', profile_url: 'https://www.linkedin.com/in/reidhoffman/' },
-  { slug: 'adam-grant', name: 'Adam Grant', profile_url: 'https://www.linkedin.com/in/adammgrant/' },
-  { slug: 'maor-shlomo', name: 'Maor Shlomo', profile_url: 'https://www.linkedin.com/in/maor-shlomo-1088b4144/' },
-];
+const slugOf = (url) => (url || '').replace(/\/+$/, '').split('/in/')[1] || '';
+const nameOf = (report) => report.sample_name || report.full_name || slugOf(report.profile_url);
 
-async function storedReport(base44, profileUrl) {
-  const [report] = await base44.asServiceRole.entities.Analysis.filter(
-    { profile_url: profileUrl, engine_version: ENGINE_VERSION },
-    '-created_date',
-    1
+async function sampleReports(base44) {
+  const rows = await base44.asServiceRole.entities.Analysis.filter(
+    { is_sample: true, engine_version: ENGINE_VERSION },
+    '-overall_score',
+    50
   );
-  return report || null;
+  // One report per profile: keep the highest-scoring row if a profile was analyzed twice.
+  const bySlug = new Map();
+  for (const row of rows) {
+    const slug = slugOf(row.profile_url);
+    if (slug && !bySlug.has(slug)) bySlug.set(slug, row);
+  }
+  return [...bySlug.entries()].slice(0, 5);
 }
 
 export default async function (req) {
@@ -33,27 +38,22 @@ export default async function (req) {
       slug = null;
     }
 
+    const entries = await sampleReports(base44);
+
     if (slug) {
-      const entry = SAMPLES.find((s) => s.slug === slug);
-      if (!entry) return Response.json({ error: 'Unknown sample.' }, { status: 404 });
-      const report = await storedReport(base44, entry.profile_url);
-      if (!report) return Response.json({ error: 'Sample not available.' }, { status: 404 });
-      return Response.json({ analysis: report, name: entry.name });
+      const found = entries.find(([s]) => s === slug);
+      if (!found) return Response.json({ error: 'Sample not available.' }, { status: 404 });
+      return Response.json({ analysis: found[1], name: nameOf(found[1]) });
     }
 
-    const cards = [];
-    for (const entry of SAMPLES) {
-      const report = await storedReport(base44, entry.profile_url);
-      if (report) {
-        cards.push({
-          slug: entry.slug,
-          name: entry.name,
-          photo_url: report.photo_url || '',
-          overall_score: report.overall_score || 0,
-        });
-      }
-    }
-    return Response.json({ samples: cards });
+    return Response.json({
+      samples: entries.map(([s, report]) => ({
+        slug: s,
+        name: nameOf(report),
+        photo_url: report.photo_url || '',
+        overall_score: report.overall_score || 0,
+      })),
+    });
   } catch (error) {
     console.error('samples failed', error);
     return Response.json({ error: error.message }, { status: 500 });

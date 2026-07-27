@@ -6,6 +6,7 @@ import MetricCard from "@/components/signal/MetricCard";
 import MetricRadar from "@/components/signal/MetricRadar";
 import ReportBody from "@/components/signal/ReportBody";
 import ReportSubject from "@/components/signal/ReportSubject";
+import BackLink from "@/components/signal/BackLink";
 import { stripEmDashes } from "@/lib/noEmDash";
 
 export default function ReportView({ analysis, sampleLabel = false, displayName = "" }) {
@@ -21,7 +22,11 @@ export default function ReportView({ analysis, sampleLabel = false, displayName 
       <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.32em] text-neutral-400">Report</p>
+            <BackLink
+              to={sampleLabel ? "/#sample-reports" : "/"}
+              label={sampleLabel ? "All reports" : "Back"}
+            />
+            <p className="mt-6 text-[11px] uppercase tracking-[0.32em] text-neutral-400">Report</p>
             {sampleLabel && (
               <p className="mt-2 text-[11px] uppercase tracking-[0.24em] text-neutral-400">Sample report</p>
             )}
