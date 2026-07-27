@@ -26,16 +26,15 @@ export default async function (req) {
     const analysis = await base44.asServiceRole.entities.Analysis.get(analysisId);
     const name = analysis?.sample_name || analysis?.full_name || 'your profile';
 
+    // Minimal HTML paragraphs, so the separated lines survive delivery even when
+    // plain-text newlines are collapsed by the mail client.
     const body = stripEmDashesDeep(
-      `Your Linguistic Signal Report for ${name} is ready.
-
-Composite score: ${analysis?.overall_score ?? ''} out of 100.
-${analysis?.verdict_title || ''}
-
-The full report, with all five signals, the lexical measurements, the findings and the line-level revisions, is attached as a PDF here:
-${pdfUrl}
-
-Every number in the report is computed arithmetically from the public text of the profile. The same text always produces the same score.`
+      [
+        `<p>Your Linguistic Signal Report for ${name} is ready.</p>`,
+        `<p>Composite score: ${analysis?.overall_score ?? ''} out of 100.<br>${analysis?.verdict_title || ''}</p>`,
+        `<p>Download the full report (PDF): <a href="${pdfUrl}">${pdfUrl}</a></p>`,
+        `<p>Every number is computed arithmetically from the profile's public text. The same text always produces the same score.</p>`,
+      ].join('\n')
     );
 
     try {

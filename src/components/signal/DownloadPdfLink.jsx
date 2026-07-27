@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { buildReportPdf } from "@/lib/reportPdf";
+import { buildReportPdf, reportFileName } from "@/lib/reportPdf";
 
 /** Rebuilds the same report PDF in the browser and saves it. No network call. */
 export default function DownloadPdfLink({ analysis, displayName = "" }) {
   const [busy, setBusy] = useState(false);
 
-  const download = () => {
+  const download = async () => {
     setBusy(true);
-    const blob = buildReportPdf(analysis, displayName || analysis.full_name);
+    const name = displayName || analysis.full_name;
+    const blob = await buildReportPdf(analysis, name);
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "linguistic-signal-report.pdf";
+    a.download = reportFileName(name);
     a.click();
     URL.revokeObjectURL(url);
     setBusy(false);
