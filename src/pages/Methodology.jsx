@@ -99,13 +99,18 @@ export default function Methodology() {
         </p>
       </Section>
 
-      <Section label="Corpus coverage">
+      <Section label="Corpus sufficiency">
         <p>
-          Sparse profiles are scaled by corpus coverage: the share of the{" "}
+          Very short corpora are scaled down by a volume sufficiency factor: the total word
+          count divided by {c.sufficiency_words}, capped at 1. That factor multiplies topical
+          focus, lexical distinctiveness and redundancy control, because a text of a few dozen
+          words satisfies those three by construction. A corpus of {c.sufficiency_words} words
+          or more is not scaled at all.
+        </p>
+        <p>
+          Message consistency carries a separate factor of its own: the share of the{" "}
           {c.coverage_surfaces} surfaces that actually carry text, raised to the power of{" "}
-          {c.coverage_exponent}. That factor multiplies message consistency, topical focus,
-          lexical distinctiveness and redundancy control, because a very short text satisfies
-          those three by construction. This is why an almost empty profile cannot score high.
+          {c.coverage_exponent}, since a missing surface cannot restate the claim.
         </p>
       </Section>
 

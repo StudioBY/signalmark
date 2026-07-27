@@ -1,4 +1,4 @@
-import { computeDeterministicMetrics, cleanSurfaces, corpusCoverage, ENGINE_VERSION } from './textMetrics.ts';
+import { computeDeterministicMetrics, cleanSurfaces, volumeSufficiency, ENGINE_VERSION } from './textMetrics.ts';
 import { computeSemanticScores, SEMANTIC_METHOD } from './semanticScoring.ts';
 import { semanticCacheKey } from './semanticCache.ts';
 import { stripEmDashesDeep } from './noEmDash.ts';
@@ -128,16 +128,16 @@ export async function runEngine(extracted, invokeLLM, cache = null) {
   const cleaned = cleanSurfaces(extracted);
   const semantic = computeSemanticScores(cleaned);
 
-  // Corpus coverage scales the metrics that a tiny corpus satisfies by construction.
-  // Message consistency and topical focus already carry it, so they are not scaled twice.
-  const coverage = corpusCoverage(semantic.inventory.present_surfaces.length);
+  // Volume sufficiency scales the metrics a very short corpus satisfies by construction.
+  // Message consistency is not scaled here: it carries its own surface-coverage factor.
+  const sufficiency = volumeSufficiency(deterministic.stats.word_count);
 
   const scores = {
     message_consistency: clampScore(semantic.scores.message_consistency),
-    topical_focus: clampScore(semantic.scores.topical_focus),
+    topical_focus: clampScore(semantic.scores.topical_focus * sufficiency),
     evidence_density: clampScore(deterministic.scores.evidence_density),
-    lexical_distinctiveness: clampScore(deterministic.scores.lexical_distinctiveness * coverage),
-    redundancy: clampScore(deterministic.scores.redundancy * coverage),
+    lexical_distinctiveness: clampScore(deterministic.scores.lexical_distinctiveness * sufficiency),
+    redundancy: clampScore(deterministic.scores.redundancy * sufficiency),
   };
 
   // Composite: arithmetic only. The model never touches this number.
@@ -157,15 +157,19 @@ export async function runEngine(extracted, invokeLLM, cache = null) {
     if (cacheKey) await cache.set(cacheKey, ENGINE_VERSION, narrative);
   }
 
-  const coverageNote =
-    coverage < 1 ? `, scaled by corpus coverage factor ${Math.round(coverage * 100) / 100}` : '';
+  const sufficiencyNote =
+    sufficiency < 1
+      ? `, scaled by corpus sufficiency factor ${(Math.round(sufficiency * 100) / 100).toFixed(2)}`
+      : '';
 
   const observations = {
     message_consistency: semantic.observations.message_consistency,
-    topical_focus: semantic.observations.topical_focus,
+    topical_focus: sufficiencyNote
+      ? semantic.observations.topical_focus.replace(/\.\s*Calibration/, `${sufficiencyNote}. Calibration`)
+      : semantic.observations.topical_focus,
     evidence_density: `${deterministic.stats.evidence_marker_count} quantified markers across ${deterministic.stats.word_count} words (${deterministic.stats.evidence_per_100_words} per 100). Calibration: 6.5 per 100 words scores 100.`,
-    lexical_distinctiveness: `Type-token ratio ${deterministic.stats.type_token_ratio}; ${deterministic.stats.boilerplate_per_100_words} boilerplate markers per 100 words${deterministic.stats.boilerplate_hits.length ? ` (${deterministic.stats.boilerplate_hits.slice(0, 3).join(', ')})` : ''}${coverageNote}.`,
-    redundancy: `Trigram repeat rate ${deterministic.stats.trigram_repeat_rate}; ${deterministic.stats.filler_per_100_words} filler markers per 100 words${coverageNote}.`,
+    lexical_distinctiveness: `Type-token ratio ${deterministic.stats.type_token_ratio}; ${deterministic.stats.boilerplate_per_100_words} boilerplate markers per 100 words${deterministic.stats.boilerplate_hits.length ? ` (${deterministic.stats.boilerplate_hits.slice(0, 3).join(', ')})` : ''}${sufficiencyNote}.`,
+    redundancy: `Trigram repeat rate ${deterministic.stats.trigram_repeat_rate}; ${deterministic.stats.filler_per_100_words} filler markers per 100 words${sufficiencyNote}.`,
   };
 
   // Post-processing pass: no em dash survives into storage, display, PDF or email.

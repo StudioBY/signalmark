@@ -28,17 +28,27 @@ export const CALIBRATION = {
   coverage_surfaces: 3,
   /** exponent applied to the populated-surface share */
   coverage_exponent: 2,
+  /** corpus word count at which volume-sensitive metrics are no longer scaled down */
+  sufficiency_words: 200,
 };
 
 /**
  * Corpus coverage factor: the share of populated surfaces, raised to the coverage
- * exponent. A single definition, applied to message consistency, topical focus,
- * lexical distinctiveness and redundancy control, so a near-empty corpus cannot
- * score high on metrics that tiny texts satisfy by construction.
+ * exponent. Used by message consistency only, where a missing surface means the claim
+ * cannot recur across surfaces.
  */
 export function corpusCoverage(presentSurfaces) {
   const share = Math.max(0, Math.min(1, presentSurfaces / CALIBRATION.coverage_surfaces));
   return share ** CALIBRATION.coverage_exponent;
+}
+
+/**
+ * Volume sufficiency factor: linear in the total corpus word count up to
+ * sufficiency_words, then 1. Applied to topical focus, lexical distinctiveness and
+ * redundancy control, which very short texts satisfy by construction.
+ */
+export function volumeSufficiency(wordCount) {
+  return Math.max(0, Math.min(1, (Number(wordCount) || 0) / CALIBRATION.sufficiency_words));
 }
 
 /** Removes URLs before any metric is computed — they are not language. */
@@ -79,8 +89,7 @@ const BOILERPLATE = [
   "strategic thinker", "detail oriented", "detail-oriented", "driven professional", "storyteller",
   "helping companies", "helping businesses", "on a mission", "obsessed with", "love what i do",
   // LinkedIn's auto-generated About template.
-  "experienced", "with a demonstrated history of working in", "skilled in", "strong",
-  "professional with a",
+  "with a demonstrated history of working in", "skilled in", "professional with a",
 ];
 
 /** Filler / hedging register. Counts against redundancy control. */

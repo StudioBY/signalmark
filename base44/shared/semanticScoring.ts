@@ -220,12 +220,11 @@ export function computeSemanticScores({ headline = '', about = '', posts = '' })
     corpusCentroid = vectors[0];
   }
   const concentration = clusterConcentration(clusters.length, vectors.length);
-  // Scaled by corpus coverage: a tiny corpus concentrates by construction.
   const topical_focus = vectors.length < 2
     ? Math.round(clamp(vectors.length * 5))
     : Math.round(clamp(
-        (FOCUS_CENTROID_WEIGHT * rampUp(meanCentroidCos, FOCUS_TARGET_COS) +
-          (1 - FOCUS_CENTROID_WEIGHT) * concentration) * coverage
+        FOCUS_CENTROID_WEIGHT * rampUp(meanCentroidCos, FOCUS_TARGET_COS) +
+          (1 - FOCUS_CENTROID_WEIGHT) * concentration
       ));
 
   const dominant_topics = vectors.length ? topTerms(corpusCentroid, 5) : [];
@@ -250,7 +249,7 @@ export function computeSemanticScores({ headline = '', about = '', posts = '' })
       topical_focus:
         vectors.length < 2
           ? `Only ${vectors.length} text unit available, which is insufficient to establish topic concentration.`
-          : `${vectors.length} text units resolve into ${clusters.length} topic clusters (largest holds ${clusters.length ? Math.max(...clusters) : 0}), mean cosine to the corpus centroid ${round2(meanCentroidCos)}${coverage < 1 ? `, scaled by corpus coverage factor ${round2(coverage)}` : ''}. Calibration: 0.60 mean centroid cosine in a single cluster scores 100.`,
+          : `${vectors.length} text units resolve into ${clusters.length} topic clusters (largest holds ${clusters.length ? Math.max(...clusters) : 0}), mean cosine to the corpus centroid ${round2(meanCentroidCos)}. Calibration: 0.60 mean centroid cosine in a single cluster scores 100.`,
     },
   };
 }
