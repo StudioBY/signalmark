@@ -46,6 +46,10 @@ export default function PurchaseForm({ onSubmit, busy }) {
         className="mt-4 w-full border-0 border-b border-neutral-300 bg-transparent pb-3 text-[17px] font-light outline-none placeholder:text-neutral-300 focus:border-[#1B2430]"
       />
 
+      <p className="mt-4 text-[13px] font-light text-neutral-400">
+        A PDF copy of the full report will be sent to this address.
+      </p>
+
       {error && (
         <p className="mt-6 text-[11px] uppercase tracking-[0.2em] text-neutral-500">{error}</p>
       )}

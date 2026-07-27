@@ -33,6 +33,11 @@
     "amount_cents": {
       "type": "number",
       "default": 100
+    },
+    "pdf_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "True once the report PDF has been emailed, keeps delivery idempotent"
     }
   },
   "required": [

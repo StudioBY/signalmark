@@ -6,6 +6,7 @@ import PurchaseForm from "@/components/signal/PurchaseForm";
 import SampleReports from "@/components/signal/SampleReports";
 import PlansSection from "@/components/signal/PlansSection";
 import AnalysisProgress from "@/components/signal/AnalysisProgress";
+import Footer from "@/components/signal/Footer";
 
 export default function Home() {
   const [busy, setBusy] = useState(false);
@@ -58,9 +59,11 @@ export default function Home() {
             A measurement of how your profile writes.
           </h1>
           <p className="mt-6 max-w-lg text-[17px] font-light leading-[1.7] text-neutral-500">
-            Five text-derived signals (consistency, evidence density, topical focus, lexical
-            distinctiveness and redundancy), computed from the headline, About section and recent
-            posts of any public profile. No rubric grading, no opinions.
+            Five text-derived signals (message consistency, evidence density, topical focus,
+            lexical distinctiveness and redundancy control), computed from the headline, About
+            section and recent posts of any public LinkedIn profile. Deterministic and
+            reproducible: the same text always produces the same score. No rubric grading, no
+            opinions.
           </p>
         </motion.div>
 
@@ -74,6 +77,7 @@ export default function Home() {
 
         <SampleReports />
         <PlansSection />
+        <Footer />
       </div>
     </div>
   );

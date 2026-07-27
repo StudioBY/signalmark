@@ -6,6 +6,26 @@
 
 export const ENGINE_VERSION = "3.1.0-deterministic";
 
+/**
+ * The calibration constants of the three lexical metrics, in one auditable place.
+ * These are the live values the formulas below read: the published methodology page
+ * renders this object, so the documentation can never drift from the engine.
+ */
+export const CALIBRATION = {
+  /** evidence markers per 100 words that scores 100 */
+  evidence_target_per_100_words: 6.5,
+  /** moving-average type-token ratio that scores 100 */
+  mattr_target: 0.75,
+  /** points deducted per boilerplate marker per 100 words */
+  boilerplate_penalty_per_100_words: 12,
+  /** trigram repeat rate at which redundancy control scores 0 */
+  repeat_rate_tolerance: 0.15,
+  /** filler markers per 100 words that incur the full filler penalty */
+  filler_penalty_rate: 3,
+  /** maximum points deducted for filler */
+  filler_max_penalty: 30,
+};
+
 /** Removes URLs before any metric is computed — they are not language. */
 export function stripUrls(text) {
   return text
@@ -227,12 +247,16 @@ export function computeDeterministicMetrics({ headline = "", about = "", posts =
   const boilerPer100 = per100(boiler.total);
   const fillerPer100 = per100(filler.total);
 
-  const evidence_density = Math.round(rampUp(evidencePer100, 6.5));
+  const C = CALIBRATION;
+  const evidence_density = Math.round(rampUp(evidencePer100, C.evidence_target_per_100_words));
   const lexical_distinctiveness = Math.round(
-    clamp(rampUp(ttr, 0.75) - boilerPer100 * 12)
+    clamp(rampUp(ttr, C.mattr_target) - boilerPer100 * C.boilerplate_penalty_per_100_words)
   );
   const redundancy = Math.round(
-    clamp(rampDown(repeat_rate, 0.15) - Math.min(30, (fillerPer100 / 3) * 30))
+    clamp(
+      rampDown(repeat_rate, C.repeat_rate_tolerance) -
+        Math.min(C.filler_max_penalty, (fillerPer100 / C.filler_penalty_rate) * C.filler_max_penalty)
+    )
   );
 
   return {

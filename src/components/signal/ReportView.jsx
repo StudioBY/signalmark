@@ -7,9 +7,10 @@ import MetricRadar from "@/components/signal/MetricRadar";
 import ReportBody from "@/components/signal/ReportBody";
 import ReportSubject from "@/components/signal/ReportSubject";
 import BackLink from "@/components/signal/BackLink";
+import Footer from "@/components/signal/Footer";
 import { stripEmDashes } from "@/lib/noEmDash";
 
-export default function ReportView({ analysis, sampleLabel = false, displayName = "" }) {
+export default function ReportView({ analysis, sampleLabel = false, displayName = "", sentTo = "" }) {
   const metrics = analysis.metrics || [];
   const slug = (analysis.profile_url || "").replace(/\/+$/, "").split("/in/")[1];
   const subjectLabel = displayName || analysis.full_name || (slug ? `linkedin.com/in/${slug}` : "");
@@ -36,6 +37,12 @@ export default function ReportView({ analysis, sampleLabel = false, displayName 
             New analysis
           </Link>
         </div>
+
+        {sentTo && (
+          <p className="mt-10 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
+            Report sent to {sentTo}
+          </p>
+        )}
 
         {limitedCorpus && (
           <p className="mt-10 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
@@ -72,6 +79,8 @@ export default function ReportView({ analysis, sampleLabel = false, displayName 
         <div className="mt-28">
           <ReportBody analysis={analysis} />
         </div>
+
+        <Footer />
       </div>
     </div>
   );

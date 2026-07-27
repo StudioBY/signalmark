@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import ReportView from "@/components/signal/ReportView";
 import AnalysisProgress from "@/components/signal/AnalysisProgress";
+import { deliverReportPdf } from "@/lib/deliverReportPdf";
 
 export default function Results() {
   const params = new URLSearchParams(window.location.search);
@@ -10,6 +11,7 @@ export default function Results() {
   const sessionId = params.get("session_id");
 
   const [analysis, setAnalysis] = useState(null);
+  const [sentTo, setSentTo] = useState("");
   const [failure, setFailure] = useState("");
 
   useEffect(() => {
@@ -24,6 +26,14 @@ export default function Results() {
         .catch(() => setFailure("Analysis failed, your payment will be refunded"));
     }
   }, [id, sessionId]);
+
+  // PDF delivery runs after the report is on screen and can never block it.
+  useEffect(() => {
+    if (!analysis?.id || !sessionId) return;
+    deliverReportPdf(analysis, analysis.full_name).then((email) => {
+      if (email) setSentTo(email);
+    });
+  }, [analysis, sessionId]);
 
   if (failure) {
     return (
@@ -50,5 +60,5 @@ export default function Results() {
     );
   }
 
-  return <ReportView analysis={analysis} />;
+  return <ReportView analysis={analysis} sentTo={sentTo} />;
 }

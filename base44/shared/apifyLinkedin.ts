@@ -1,5 +1,5 @@
 /** Posts are billed per result — never fetch more than this per analysis. */
-const MAX_POSTS = 20;
+export const MAX_POSTS = 20;
 
 const PROFILE_ACTOR = "apimaestro~linkedin-profile-detail";
 const POSTS_ACTOR = "apimaestro~linkedin-profile-posts";
